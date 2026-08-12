@@ -2,38 +2,44 @@
 
 ## Current sprint
 
-Auth Sprint 2: Credentials authentication with bcrypt.
+Auth Sprint 3: Organisation onboarding.
 
 ## Completed
 
-- Preserved the root-level App Router authentication UI and mock business-data flows.
-- Added Auth.js v5 Credentials authentication with the existing Prisma adapter.
-- Added JWT sessions containing the safe user fields `id`, `name`, `email`, and `image`.
-- Added Zod-validated registration and login Server Actions.
-- Added server-only asynchronous bcrypt hashing and verification with cost factor 12.
-- Added case-normalized email registration and case-insensitive lookup.
-- Added safe duplicate-account handling, including unique-constraint races.
-- Connected the existing login, signup, and user-menu logout controls.
-- Added pending, disabled, validation, authentication-error, and registration-success states.
-- Added authenticated redirects away from `/login` and `/signup`.
-- Added local-only callback validation to prevent open redirects.
-- Applied the existing Auth Sprint 1 migration to the configured PostgreSQL database.
-- Documented the required `AUTH_SECRET` environment variable.
+- Preserved and connected the existing onboarding interface.
+- Added Zod-validated organisation-name onboarding with structured field and server errors.
+- Added server-side authenticated user resolution; no user, organisation, or role identity is accepted from the browser.
+- Added transactional organisation and OWNER membership creation.
+- Added serializable transaction conflict retries and an in-transaction active-membership check to prevent duplicate onboarding.
+- Added deterministic active-organisation resolution using membership creation time and membership ID.
+- Added reusable `requireUser()` and `requireOrganization()` server helpers.
+- Redirected unauthenticated onboarding visits to login with a safe onboarding callback.
+- Redirected onboarded users away from onboarding to the dashboard.
+- Added pending and disabled submission states to the existing onboarding form.
+- Revalidated onboarding and dashboard routes after successful creation.
 
 ## Validation
 
 - Prisma schema validation passes.
 - TypeScript validation passes.
 - ESLint passes.
-- Live registration, duplicate registration, validation, login, session, redirect, and logout checks pass.
-- The stored test password was confirmed as a bcrypt cost-12 hash without exposing it.
-- The session contains the user ID and does not expose the password hash.
-- The dedicated smoke-test account was removed after validation.
+- Production build passes.
+- Unauthenticated `/onboarding` access redirects to `/login?callbackUrl=%2Fonboarding`.
+- An authenticated user without a membership can access the existing onboarding form.
+- Empty onboarding data creates no organisation or membership records.
+- Empty and whitespace-only organisation names are rejected.
+- Valid onboarding creates one organisation and one related OWNER membership.
+- Concurrent double submission creates only one organisation and membership.
+- A direct repeated creation call returns the existing-onboarding result without creating records.
+- An onboarded user visiting `/onboarding` is redirected to `/dashboard`.
+- Source inspection confirms only `organizationName` is read from form data; user identity and OWNER role are resolved server-side.
+- Active organisation resolution returns the first active membership ordered by creation time and membership ID.
+- The disposable smoke-test user and all associated records were removed after validation.
 
 ## Not implemented in this sprint
 
-- Organisation onboarding mutations
 - Full protected-route and organisation access enforcement
+- Organisation switching or additional organisation creation
 - Password reset or email verification
 - Customer, catalog, quote, or quote-line-item database models
 
@@ -41,5 +47,5 @@ Those business features continue to use the existing mock data.
 
 ## Next recommended sprint
 
-Implement organisation onboarding and reusable server-side user, membership, and
-role access helpers before protecting the authenticated application routes.
+Auth Sprint 4 should enforce shared authenticated application-route protection,
+require an active organisation, and add server-side organisation role helpers.

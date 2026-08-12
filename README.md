@@ -43,5 +43,6 @@ Open [http://localhost:3000](http://localhost:3000) in a browser.
 - `generated/prisma/` contains the generated Prisma Client and should not be edited manually.
 
 Credentials registration, login, logout, and JWT sessions are implemented with
-Auth.js, Prisma, Zod, and bcrypt. Registration redirects to login and does not
-create an organisation; organisation onboarding remains a later sprint.
+Auth.js, Prisma, Zod, and bcrypt. Authenticated users can create their first
+organisation through transactional onboarding, which assigns an OWNER
+membership before redirecting to the dashboard.
