@@ -46,3 +46,7 @@ Credentials registration, login, logout, and JWT sessions are implemented with
 Auth.js, Prisma, Zod, and bcrypt. Authenticated users can create their first
 organisation through transactional onboarding, which assigns an OWNER
 membership before redirecting to the dashboard.
+
+Authenticated application routes are protected through their shared server
+layout. Server-only access helpers resolve the session user and first active
+organisation membership before rendering organisation-scoped UI.

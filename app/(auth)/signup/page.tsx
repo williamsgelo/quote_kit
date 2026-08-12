@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/auth";
 import { SignupForm } from "@/components/auth/signup-form";
+import { getAuthenticatedAppPath } from "@/lib/auth/access";
 
 export default async function SignupPage() {
-  const session = await auth();
+  const authenticatedAppPath = await getAuthenticatedAppPath();
 
-  if (session?.user) {
-    redirect("/onboarding");
+  if (authenticatedAppPath) {
+    redirect(authenticatedAppPath);
   }
 
   return (

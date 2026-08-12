@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth/access";
 import { getActiveOrganizationMembership } from "@/lib/auth/organization";
 
 export default async function OnboardingPage() {
-  const user = await requireUser("/onboarding");
+  const user = await requireUser({ callbackUrl: "/onboarding" });
   const activeMembership = await getActiveOrganizationMembership(user.id);
 
   if (activeMembership) {

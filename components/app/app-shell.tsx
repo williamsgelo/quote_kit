@@ -31,7 +31,26 @@ const navigation = [
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+type ShellUser = {
+  name: string | null;
+  email: string | null;
+  image: string | null;
+};
+
+type MembershipRole = "OWNER" | "ADMIN" | "MEMBER";
+
+type ShellData = {
+  user: ShellUser;
+  organization: { name: string };
+  membershipRole: MembershipRole;
+};
+
+function SidebarContent({
+  user,
+  organization,
+  membershipRole,
+  onNavigate,
+}: ShellData & { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -90,22 +109,31 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <BookOpen className="size-4" aria-hidden="true" />
           QuoteKit guide
         </Link>
-        <OrganisationSwitcher inverted />
+        <OrganisationSwitcher name={organization.name} inverted />
         <div className="rounded-lg bg-white p-0.5 text-slate-950">
-          <UserMenu />
+          <UserMenu user={user} membershipRole={membershipRole} />
         </div>
       </div>
     </div>
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  user,
+  organization,
+  membershipRole,
+}: { children: ReactNode } & ShellData) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="min-h-dvh bg-slate-50">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 lg:block">
-        <SidebarContent />
+        <SidebarContent
+          user={user}
+          organization={organization}
+          membershipRole={membershipRole}
+        />
       </aside>
 
       {mobileOpen && (
@@ -125,7 +153,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <X className="size-4" aria-hidden="true" />
             </button>
-            <SidebarContent onNavigate={() => setMobileOpen(false)} />
+            <SidebarContent
+              user={user}
+              organization={organization}
+              membershipRole={membershipRole}
+              onNavigate={() => setMobileOpen(false)}
+            />
           </aside>
         </div>
       )}
@@ -158,7 +191,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Bell className="size-4" aria-hidden="true" />
               <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-blue-600 ring-2 ring-background" />
             </button>
-            <UserMenu compact />
+            <UserMenu
+              user={user}
+              membershipRole={membershipRole}
+              compact
+            />
           </div>
         </header>
         <main className="mx-auto w-full max-w-400 p-4 sm:p-6 lg:p-8">

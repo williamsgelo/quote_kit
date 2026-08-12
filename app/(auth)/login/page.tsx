@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/auth";
 import { LoginForm } from "@/components/auth/login-form";
+import { getAuthenticatedAppPath } from "@/lib/auth/access";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
 
 export default async function LoginPage({
@@ -13,10 +13,10 @@ export default async function LoginPage({
     registered?: string | string[];
   }>;
 }) {
-  const session = await auth();
+  const authenticatedAppPath = await getAuthenticatedAppPath();
 
-  if (session?.user) {
-    redirect("/onboarding");
+  if (authenticatedAppPath) {
+    redirect(authenticatedAppPath);
   }
 
   const params = await searchParams;

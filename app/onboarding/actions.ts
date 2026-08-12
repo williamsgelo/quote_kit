@@ -34,7 +34,7 @@ export async function createOrganizationAction(
   _previousState: OnboardingActionState,
   formData: FormData,
 ): Promise<OnboardingActionState> {
-  const user = await requireUser("/onboarding");
+  const user = await requireUser({ behavior: "throw" });
   const parsedOnboarding = onboardingSchema.safeParse({
     organizationName: formData.get("organizationName"),
   });

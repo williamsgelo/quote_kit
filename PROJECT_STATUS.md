@@ -2,21 +2,21 @@
 
 ## Current sprint
 
-Auth Sprint 3: Organisation onboarding.
+Auth Sprint 4: Server-side tenant access and protected application routes.
 
 ## Completed
 
-- Preserved and connected the existing onboarding interface.
-- Added Zod-validated organisation-name onboarding with structured field and server errors.
-- Added server-side authenticated user resolution; no user, organisation, or role identity is accepted from the browser.
-- Added transactional organisation and OWNER membership creation.
-- Added serializable transaction conflict retries and an in-transaction active-membership check to prevent duplicate onboarding.
-- Added deterministic active-organisation resolution using membership creation time and membership ID.
-- Added reusable `requireUser()` and `requireOrganization()` server helpers.
-- Redirected unauthenticated onboarding visits to login with a safe onboarding callback.
-- Redirected onboarded users away from onboarding to the dashboard.
-- Added pending and disabled submission states to the existing onboarding form.
-- Revalidated onboarding and dashboard routes after successful creation.
+- Added reusable server-only `requireUser()`, `requireOrganization()`, `requireOrganizationRole()`, and `assertOrganizationAccess()` helpers.
+- Added explicit redirecting page guards and throwing action/API authorization behavior.
+- Verified session users against PostgreSQL and return only safe user fields.
+- Protected dashboard, customer, catalog, quote, and settings routes once through the shared server application layout.
+- Kept active-organisation selection deterministic through the first active membership ordered by creation time and membership ID.
+- Added explicit-list role authorization for OWNER, ADMIN, and MEMBER roles without implicit hierarchy.
+- Added cross-tenant membership verification using both the authenticated user ID and requested organisation ID.
+- Connected authenticated user and active organisation data to the existing application shell, user menu, and display-only organisation switcher.
+- Updated login and signup redirects for authenticated users with and without active memberships.
+- Added bounded retries for transient hosted PostgreSQL connection closures on access-control reads.
+- Kept middleware absent; the shared server layout and server-only helpers remain the security boundary.
 
 ## Validation
 
@@ -26,20 +26,22 @@ Auth Sprint 3: Organisation onboarding.
 - Production build passes.
 - Unauthenticated `/onboarding` access redirects to `/login?callbackUrl=%2Fonboarding`.
 - An authenticated user without a membership can access the existing onboarding form.
-- Empty onboarding data creates no organisation or membership records.
-- Empty and whitespace-only organisation names are rejected.
-- Valid onboarding creates one organisation and one related OWNER membership.
-- Concurrent double submission creates only one organisation and membership.
-- A direct repeated creation call returns the existing-onboarding result without creating records.
-- An onboarded user visiting `/onboarding` is redirected to `/dashboard`.
-- Source inspection confirms only `organizationName` is read from form data; user identity and OWNER role are resolved server-side.
-- Active organisation resolution returns the first active membership ordered by creation time and membership ID.
-- The disposable smoke-test user and all associated records were removed after validation.
+- Logged-out visits to all five protected route groups redirect to `/login`.
+- Authenticated users without an active organisation redirect to `/onboarding`.
+- Active members can access all protected route groups.
+- Login and signup redirect authenticated users to onboarding or dashboard according to membership state.
+- Onboarded users visiting onboarding redirect to the dashboard.
+- Cross-tenant organisation IDs are rejected; own-organisation access returns minimal membership details.
+- OWNER and ADMIN explicit role checks pass; MEMBER is rejected from an owner-only operation.
+- Inactive organisations are not selected and deleted-user sessions redirect to login.
+- Public landing, login, and signup routes remain accessible without a session.
+- The shell displays the authenticated user and active organisation without exposing other memberships.
+- Disposable test users, organisations, memberships, and test routes were removed after validation.
 
 ## Not implemented in this sprint
 
-- Full protected-route and organisation access enforcement
 - Organisation switching or additional organisation creation
+- Feature-specific role policies and CRUD authorization
 - Password reset or email verification
 - Customer, catalog, quote, or quote-line-item database models
 
@@ -47,5 +49,5 @@ Those business features continue to use the existing mock data.
 
 ## Next recommended sprint
 
-Auth Sprint 4 should enforce shared authenticated application-route protection,
-require an active organisation, and add server-side organisation role helpers.
+Implement the first organisation-scoped business-data feature, applying the
+shared access helpers to every server read and mutation.
