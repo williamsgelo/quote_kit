@@ -2,35 +2,44 @@
 
 ## Current sprint
 
-Auth Sprint 1: Prisma and authentication database foundation.
+Auth Sprint 2: Credentials authentication with bcrypt.
 
 ## Completed
 
-- Preserved the existing root-level App Router UI and mock-data flows.
-- Configured Prisma 7 for PostgreSQL.
-- Added Auth.js-compatible `User`, `Account`, `Session`, and `VerificationToken` models.
-- Added `Organization` and `Membership` tenancy models with role-based membership constraints.
-- Added a nullable `User.passwordHash`; no plaintext password field or hashing behavior exists.
-- Added a server-only Prisma client backed by the Prisma PostgreSQL driver adapter and protected against development hot-reload connection churn.
-- Documented the required `DATABASE_URL` setup.
-- Created the initial `20260731163000_auth_foundation` PostgreSQL migration.
-- Prisma formatting, schema validation, client generation, TypeScript validation, and linting pass.
+- Preserved the root-level App Router authentication UI and mock business-data flows.
+- Added Auth.js v5 Credentials authentication with the existing Prisma adapter.
+- Added JWT sessions containing the safe user fields `id`, `name`, `email`, and `image`.
+- Added Zod-validated registration and login Server Actions.
+- Added server-only asynchronous bcrypt hashing and verification with cost factor 12.
+- Added case-normalized email registration and case-insensitive lookup.
+- Added safe duplicate-account handling, including unique-constraint races.
+- Connected the existing login, signup, and user-menu logout controls.
+- Added pending, disabled, validation, authentication-error, and registration-success states.
+- Added authenticated redirects away from `/login` and `/signup`.
+- Added local-only callback validation to prevent open redirects.
+- Applied the existing Auth Sprint 1 migration to the configured PostgreSQL database.
+- Documented the required `AUTH_SECRET` environment variable.
 
-## Current blockers
+## Validation
 
-- Migration deployment is pending because `DATABASE_URL` is not configured in the local environment.
-- The sandboxed production build could not fetch the existing Geist font files from Google Fonts; run `npm run build` in a network-enabled environment.
+- Prisma schema validation passes.
+- TypeScript validation passes.
+- ESLint passes.
+- Live registration, duplicate registration, validation, login, session, redirect, and logout checks pass.
+- The stored test password was confirmed as a bcrypt cost-12 hash without exposing it.
+- The session contains the user ID and does not expose the password hash.
+- The dedicated smoke-test account was removed after validation.
 
 ## Not implemented in this sprint
 
-- Registration and password hashing
-- Credentials login and Auth.js configuration
 - Organisation onboarding mutations
-- Protected-route enforcement
-- Customers, catalog items, quotes, and quote line item database models
+- Full protected-route and organisation access enforcement
+- Password reset or email verification
+- Customer, catalog, quote, or quote-line-item database models
 
-Those business features continue to use the existing mock data until their dedicated backend sprints.
+Those business features continue to use the existing mock data.
 
 ## Next recommended sprint
 
-Auth Sprint 2 should configure Auth.js credentials authentication, add Zod-validated registration and login Server Actions, hash passwords securely, and create reusable server-side user and organisation access helpers without redesigning the existing forms.
+Implement organisation onboarding and reusable server-side user, membership, and
+role access helpers before protecting the authenticated application routes.

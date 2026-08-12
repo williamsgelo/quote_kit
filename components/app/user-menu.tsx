@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronDown, CircleHelp, LogOut, Settings } from "lucide-react";
 
+import { logoutAction } from "@/app/(auth)/actions";
 import { cn } from "@/lib/utils";
 
 export function UserMenu({ compact = false }: { compact?: boolean }) {
@@ -59,13 +60,15 @@ export function UserMenu({ compact = false }: { compact?: boolean }) {
           <CircleHelp className="size-3.5" aria-hidden="true" />
           Help & support
         </button>
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <LogOut className="size-3.5" aria-hidden="true" />
-          Sign out
-        </button>
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <LogOut className="size-3.5" aria-hidden="true" />
+            Sign out
+          </button>
+        </form>
       </div>
     </details>
   );
