@@ -2,55 +2,52 @@
 
 ## Current sprint
 
-Auth Sprint 5: Authentication completion, development seed, documentation and hardening.
+Sprint 6: Customer backend and CRUD.
 
 ## Completed
 
-- Verified the full credentials flow from registration through onboarding, protected application access, session display, and logout.
-- Kept bcrypt password hashing asynchronous at cost 12, with 8-character minimum and 72-byte maximum registration validation.
-- Extracted server-only credential verification and registration services so production behavior is directly integration tested.
-- Added an idempotent, production-disabled development seed for one user, one organisation, and one OWNER membership.
-- Added explicit Node version and reusable typecheck, unit-test, integration-test, combined-test, and seed commands.
-- Added focused validation, password, safe-redirect, role, registration, login, onboarding concurrency, relationship, and cross-tenant tests.
-- Added a pending state to the existing logout control without redesigning the application shell.
-- Documented environment variables, installation, Prisma workflows, validation commands, auth testing, and relevant troubleshooting.
-- Confirmed session and tenant helpers return deliberately minimal data and never return `passwordHash`.
-- Confirmed the shared server layout remains the protected-route security boundary; no middleware-only or client-only authorization was added.
-- Configured Auth.js to trust the Next.js host boundary explicitly, preventing `UntrustedHost` failures in both development and local production mode.
-- Kept Customer, Catalog, and Quote pages on their existing mock data.
+- Added the organisation-owned Customer Prisma model and applied the `20260814095219_customer_backend` migration.
+- Added customer name, company, contact, tax, address, notes, archive, and timestamp fields with organisation and active-list indexes.
+- Replaced the customer list mock data with PostgreSQL reads scoped to the authenticated active organisation.
+- Added server-side customer search across name, company, email, and phone.
+- Added customer create, detail, edit, and soft-archive routes while preserving the existing application design system.
+- Added shared Zod validation with trimming, email normalisation, optional empty-string normalisation, phone validation, and field length limits.
+- Added server-only customer query and mutation services so pages remain thin and tenant behaviour is directly integration tested.
+- Added structured create, update, and archive Server Actions with pending states, field errors, general errors, route revalidation, and safe redirects.
+- Added safe not-found handling for both missing and cross-organisation customer IDs.
+- Removed the obsolete customer mock array; Catalog and Quotes remain mock-data features.
 
-## Security controls
+## Tenant security
 
-- User identity is derived from the Auth.js server session and verified against PostgreSQL.
-- Registration email addresses are trimmed and lowercased; database uniqueness safely handles races.
-- Credential failures return a generic login error and credential verification never returns the password hash.
-- Redirect destinations accept only safe internal paths and avoid auth-page loops.
-- Onboarding derives the user and OWNER role on the server and creates organisation and membership in a serializable transaction with retry handling.
-- Active organisation selection is deterministic and requires an active organisation membership.
-- Requested organisation IDs are checked against both the authenticated user ID and organisation ID.
-- Role checks use explicit allowed-role lists; no implicit privilege hierarchy is assumed.
-- Prisma, credentials services, password helpers, and access helpers remain server-only.
+- The active organisation is derived from the authenticated server session for every page and action.
+- No customer form accepts `organizationId`, user ID, membership role, or archive state.
+- Customer detail reads use both customer ID and active organisation ID.
+- Updates and archives use `updateMany` constrained by customer ID, organisation ID, and active state.
+- Cross-organisation reads, updates, and archives return the same unavailable result without revealing record existence.
+- Archive is a soft update to `isArchived = true`; normal lists and searches exclude archived customers.
 
 ## Validation
 
-- Prisma format, validate, generate, and migration status: passed; the database is up to date.
+- Prisma format: passed.
+- Prisma validate: passed.
+- Prisma Client generation: passed.
+- Customer migration: created and applied successfully.
 - TypeScript validation: passed.
-- ESLint: passed.
-- Unit tests: 7 passed.
-- PostgreSQL integration tests: 4 passed; temporary test records removed.
-- Development seed: passed twice to verify idempotency.
-- Seed inspection: bcrypt-formatted hash, OWNER role, active organisation, and relationship verified without printing the hash.
-- Production build: passed.
-- Production start smoke test: passed with a configured local Auth.js origin; `/` returned 200 and logged-out `/dashboard` returned a 307 redirect to `/login`.
-- Playwright end-to-end tests: not configured; browser flow remains a manual check.
+- ESLint: passed with no warnings.
+- Unit tests: 9 passed, including customer normalisation and invalid input.
+- PostgreSQL integration tests: 9 passed, including customer create, search, update, archive, and tenant isolation.
+- Production build: passed with all customer routes dynamically server-rendered.
+- Authenticated production-route smoke test: passed for login redirect, customer list, create form, search empty state, and safe missing-customer rendering.
+- Interactive browser CRUD validation: not available in this session because no browser instance was connected; mutation behaviour is covered by the PostgreSQL integration suite.
 
 ## Remaining limitations
 
-- No password reset, email verification, MFA, social login, or rate limiting.
-- No organisation switching or additional organisation creation UI.
-- No browser automation suite is configured.
-- Customers, Catalog, Quotes, and quote line items remain mock-data features.
+- Customer pagination is not implemented because the existing UI did not include pagination; the MVP list is capped at 100 active records.
+- Archived-customer browsing and restore are not implemented.
+- Quote counts and quote history remain empty until the Quote backend exists.
+- Catalog and Quotes continue using mock data.
+- Organisation switching, password reset, email verification, MFA, and rate limiting remain future work.
 
 ## Next recommended sprint
 
-Implement the Customer backend and CRUD foundation. Add the Customer Prisma model and migration, organisation-scoped server reads and Server Actions, Zod validation, tenant-isolation tests, and loading, empty, error, and success states while reusing the existing customer UI.
+Implement the Catalog backend and organisation-scoped CRUD foundation, including decimal-safe pricing, product/service validation, archive behaviour, tenant-isolation tests, and integration with the existing Catalog UI.

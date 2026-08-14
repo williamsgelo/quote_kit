@@ -7,10 +7,14 @@ export function SearchInput({
   placeholder = "Search...",
   className,
   label = "Search",
+  name,
+  defaultValue,
 }: {
   placeholder?: string;
   className?: string;
   label?: string;
+  name?: string;
+  defaultValue?: string;
 }) {
   return (
     <div className={cn("relative w-full sm:max-w-xs", className)}>
@@ -20,6 +24,8 @@ export function SearchInput({
       />
       <Input
         aria-label={label}
+        name={name}
+        defaultValue={defaultValue}
         type="search"
         placeholder={placeholder}
         className="pl-9"

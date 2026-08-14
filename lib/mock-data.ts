@@ -80,59 +80,6 @@ export const quotes: Quote[] = [
   },
 ];
 
-export const customers = [
-  {
-    id: "cus-1",
-    name: "Amelia Hart",
-    company: "Hart & Finch",
-    email: "amelia@hartandfinch.co.za",
-    phone: "+27 82 441 0932",
-    quotes: 4,
-    activity: "Viewed quote 2h ago",
-    initials: "AH",
-  },
-  {
-    id: "cus-2",
-    name: "Thabo Ndlovu",
-    company: "Ndlovu Projects",
-    email: "thabo@ndlovuprojects.co.za",
-    phone: "+27 71 885 2044",
-    quotes: 7,
-    activity: "Quote sent 1d ago",
-    initials: "TN",
-  },
-  {
-    id: "cus-3",
-    name: "Mia Petersen",
-    company: "Common Ground Studio",
-    email: "mia@commonground.studio",
-    phone: "+27 83 119 8450",
-    quotes: 3,
-    activity: "Accepted quote 3d ago",
-    initials: "MP",
-  },
-  {
-    id: "cus-4",
-    name: "James Okoro",
-    company: "Northstar Labs",
-    email: "james@northstarlabs.io",
-    phone: "+27 79 331 6810",
-    quotes: 2,
-    activity: "Added 5d ago",
-    initials: "JO",
-  },
-  {
-    id: "cus-5",
-    name: "Leila Jacobs",
-    company: "Fynbos Retail",
-    email: "leila@fynbosretail.co.za",
-    phone: "+27 60 728 1457",
-    quotes: 6,
-    activity: "Replied 1w ago",
-    initials: "LJ",
-  },
-];
-
 export const catalogItems = [
   {
     id: "item-1",

@@ -69,6 +69,14 @@ Open [http://localhost:3000](http://localhost:3000). Integration tests require a
 
 The shared server application layout protects `/dashboard`, `/customers`, `/catalog`, `/quotes`, and `/settings`. Active organisation selection uses the authenticated user's first active membership ordered by membership creation time and ID. Browser-provided user IDs, roles, and organisation IDs are never trusted.
 
+## Customer management
+
+Customers are persisted in PostgreSQL and always belong to one organisation. The `/customers` routes support active-customer listing, server-side search, create, detail, edit, and soft archive. Archived records are excluded from the normal list but retained for future historical quote relationships.
+
+Customer pages resolve the active organisation from the authenticated server session. Customer IDs from route parameters are always queried together with that organisation ID; a missing or cross-organisation record returns the same not-found response. Customer mutations use Server Actions with shared Zod validation and never accept an organisation ID from the browser.
+
+Catalog and Quote pages continue using mock data until their respective backend sprints.
+
 ## Troubleshooting
 
 - **Incorrect host or origin:** set `AUTH_URL` when the deployment origin cannot be inferred. Ensure the reverse proxy rejects arbitrary Host headers and forwards only the canonical public host.
