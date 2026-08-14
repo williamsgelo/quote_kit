@@ -2,12 +2,14 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
-import { verifyPassword } from "@/lib/auth/password";
+import { authenticateCredentials } from "@/lib/auth/credentials";
 import { prisma } from "@/lib/prisma";
-import { loginSchema } from "@/lib/validation/auth";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  // Next.js is the HTTP origin boundary for these same-origin auth routes.
+  // Deployment infrastructure must continue to reject untrusted Host headers.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
@@ -21,44 +23,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsedCredentials = loginSchema.safeParse(credentials);
-
-        if (!parsedCredentials.success) {
-          return null;
-        }
-
-        const user = await prisma.user.findFirst({
-          where: {
-            email: {
-              equals: parsedCredentials.data.email,
-              mode: "insensitive",
-            },
-          },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-            passwordHash: true,
-          },
-        });
-
-        if (
-          !user?.passwordHash ||
-          !(await verifyPassword(
-            parsedCredentials.data.password,
-            user.passwordHash,
-          ))
-        ) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-        };
+        return authenticateCredentials(credentials);
       },
     }),
   ],
@@ -79,4 +44,3 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
 });
-

@@ -28,3 +28,33 @@ export function getActiveOrganizationMembership(userId: string) {
     }),
   );
 }
+
+export function getOrganizationMembership(
+  userId: string,
+  organizationId: string,
+) {
+  return retryTransientDatabaseRead(() =>
+    prisma.membership.findUnique({
+      where: {
+        userId_organizationId: {
+          userId,
+          organizationId,
+        },
+        organization: {
+          isActive: true,
+        },
+      },
+      select: {
+        id: true,
+        role: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+          },
+        },
+      },
+    }),
+  );
+}

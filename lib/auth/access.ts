@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { MembershipRole } from "@/generated/prisma/client";
-import { getActiveOrganizationMembership } from "@/lib/auth/organization";
+import {
+  getActiveOrganizationMembership,
+  getOrganizationMembership,
+} from "@/lib/auth/organization";
+import { isOrganizationRoleAllowed } from "@/lib/auth/roles";
 import { prisma } from "@/lib/prisma";
 import { retryTransientDatabaseRead } from "@/lib/prisma-retry";
 
@@ -117,7 +121,7 @@ export async function requireOrganizationRole(
 ) {
   const context = await requireOrganization(options);
 
-  if (!allowedRoles.includes(context.membership.role)) {
+  if (!isOrganizationRoleAllowed(context.membership.role, allowedRoles)) {
     throw new OrganizationRoleRequiredError();
   }
 
@@ -126,29 +130,9 @@ export async function requireOrganizationRole(
 
 export async function assertOrganizationAccess(requestedOrganizationId: string) {
   const user = await requireUser({ behavior: "throw" });
-  const membership = await retryTransientDatabaseRead(() =>
-    prisma.membership.findUnique({
-      where: {
-        userId_organizationId: {
-          userId: user.id,
-          organizationId: requestedOrganizationId,
-        },
-        organization: {
-          isActive: true,
-        },
-      },
-      select: {
-        id: true,
-        role: true,
-        organization: {
-          select: {
-            id: true,
-            name: true,
-            isActive: true,
-          },
-        },
-      },
-    }),
+  const membership = await getOrganizationMembership(
+    user.id,
+    requestedOrganizationId,
   );
 
   if (!membership) {

@@ -12,6 +12,18 @@ import { Input } from "@/components/ui/input";
 
 const INITIAL_STATE: LoginActionState = { status: "idle" };
 
+function FieldError({ id, errors }: { id: string; errors?: string[] }) {
+  if (!errors?.length) {
+    return null;
+  }
+
+  return (
+    <p id={id} className="text-xs text-destructive">
+      {errors[0]}
+    </p>
+  );
+}
+
 function SubmitButton() {
   const { pending } = useFormStatus();
 
@@ -78,7 +90,12 @@ export function LoginForm({
           placeholder="you@company.com"
           autoComplete="email"
           required
+          aria-invalid={Boolean(state.fieldErrors?.email)}
+          aria-describedby={
+            state.fieldErrors?.email ? "login-email-error" : undefined
+          }
         />
+        <FieldError id="login-email-error" errors={state.fieldErrors?.email} />
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
@@ -101,6 +118,14 @@ export function LoginForm({
           placeholder="Enter your password"
           autoComplete="current-password"
           required
+          aria-invalid={Boolean(state.fieldErrors?.password)}
+          aria-describedby={
+            state.fieldErrors?.password ? "login-password-error" : undefined
+          }
+        />
+        <FieldError
+          id="login-password-error"
+          errors={state.fieldErrors?.password}
         />
       </div>
       <SubmitButton />

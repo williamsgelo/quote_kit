@@ -3,10 +3,8 @@
 import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/auth";
-import { Prisma } from "@/generated/prisma/client";
-import { hashPassword } from "@/lib/auth/password";
+import { createCredentialsUser } from "@/lib/auth/registration";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
-import { prisma } from "@/lib/prisma";
 import { loginSchema, registrationSchema } from "@/lib/validation/auth";
 
 type RegistrationField = "firstName" | "lastName" | "email" | "password";
@@ -20,6 +18,7 @@ export type RegistrationActionState = {
 export type LoginActionState = {
   status: "idle" | "error";
   message?: string;
+  fieldErrors?: Partial<Record<"email" | "password", string[]>>;
 };
 
 const DUPLICATE_ACCOUNT_MESSAGE =
@@ -47,48 +46,18 @@ export async function registerAction(
   const { email, name, password } = parsedRegistration.data;
 
   try {
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        email: {
-          equals: email,
-          mode: "insensitive",
-        },
-      },
-      select: { id: true },
-    });
+    const result = await createCredentialsUser({ email, name, password });
 
-    if (existingUser) {
+    if (result.status === "duplicate") {
       return {
         status: "error",
         message: DUPLICATE_ACCOUNT_MESSAGE,
         fieldErrors: { email: [DUPLICATE_ACCOUNT_MESSAGE] },
       };
     }
-
-    const passwordHash = await hashPassword(password);
-
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-      },
-      select: { id: true },
-    });
 
     return { status: "success" };
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
-      return {
-        status: "error",
-        message: DUPLICATE_ACCOUNT_MESSAGE,
-        fieldErrors: { email: [DUPLICATE_ACCOUNT_MESSAGE] },
-      };
-    }
-
+  } catch {
     return {
       status: "error",
       message: "We could not create your account. Please try again.",
@@ -108,7 +77,8 @@ export async function loginAction(
   if (!parsedCredentials.success) {
     return {
       status: "error",
-      message: "Invalid email or password.",
+      message: "Check the highlighted fields and try again.",
+      fieldErrors: parsedCredentials.error.flatten().fieldErrors,
     };
   }
 

@@ -43,10 +43,9 @@ export const loginSchema = z.object({
   email: emailSchema,
   password: z
     .string()
-    .min(1)
+    .min(1, "Password is required.")
     .refine(
       (password) =>
         new TextEncoder().encode(password).length <= MAX_BCRYPT_PASSWORD_BYTES,
     ),
 });
-

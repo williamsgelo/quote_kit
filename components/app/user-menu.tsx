@@ -1,5 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronDown, CircleHelp, LogOut, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  CircleHelp,
+  LoaderCircle,
+  LogOut,
+  Settings,
+} from "lucide-react";
+import { useFormStatus } from "react-dom";
 
 import { logoutAction } from "@/app/(auth)/actions";
 import { cn } from "@/lib/utils";
@@ -28,6 +37,25 @@ function getInitials(name: string | null, email: string | null) {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
+}
+
+function LogoutButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60"
+    >
+      {pending ? (
+        <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
+      ) : (
+        <LogOut className="size-3.5" aria-hidden="true" />
+      )}
+      {pending ? "Signing out..." : "Sign out"}
+    </button>
+  );
 }
 
 export function UserMenu({
@@ -98,13 +126,7 @@ export function UserMenu({
           Help & support
         </button>
         <form action={logoutAction}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <LogOut className="size-3.5" aria-hidden="true" />
-            Sign out
-          </button>
+          <LogoutButton />
         </form>
       </div>
     </details>

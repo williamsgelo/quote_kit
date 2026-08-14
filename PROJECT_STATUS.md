@@ -2,52 +2,55 @@
 
 ## Current sprint
 
-Auth Sprint 4: Server-side tenant access and protected application routes.
+Auth Sprint 5: Authentication completion, development seed, documentation and hardening.
 
 ## Completed
 
-- Added reusable server-only `requireUser()`, `requireOrganization()`, `requireOrganizationRole()`, and `assertOrganizationAccess()` helpers.
-- Added explicit redirecting page guards and throwing action/API authorization behavior.
-- Verified session users against PostgreSQL and return only safe user fields.
-- Protected dashboard, customer, catalog, quote, and settings routes once through the shared server application layout.
-- Kept active-organisation selection deterministic through the first active membership ordered by creation time and membership ID.
-- Added explicit-list role authorization for OWNER, ADMIN, and MEMBER roles without implicit hierarchy.
-- Added cross-tenant membership verification using both the authenticated user ID and requested organisation ID.
-- Connected authenticated user and active organisation data to the existing application shell, user menu, and display-only organisation switcher.
-- Updated login and signup redirects for authenticated users with and without active memberships.
-- Added bounded retries for transient hosted PostgreSQL connection closures on access-control reads.
-- Kept middleware absent; the shared server layout and server-only helpers remain the security boundary.
+- Verified the full credentials flow from registration through onboarding, protected application access, session display, and logout.
+- Kept bcrypt password hashing asynchronous at cost 12, with 8-character minimum and 72-byte maximum registration validation.
+- Extracted server-only credential verification and registration services so production behavior is directly integration tested.
+- Added an idempotent, production-disabled development seed for one user, one organisation, and one OWNER membership.
+- Added explicit Node version and reusable typecheck, unit-test, integration-test, combined-test, and seed commands.
+- Added focused validation, password, safe-redirect, role, registration, login, onboarding concurrency, relationship, and cross-tenant tests.
+- Added a pending state to the existing logout control without redesigning the application shell.
+- Documented environment variables, installation, Prisma workflows, validation commands, auth testing, and relevant troubleshooting.
+- Confirmed session and tenant helpers return deliberately minimal data and never return `passwordHash`.
+- Confirmed the shared server layout remains the protected-route security boundary; no middleware-only or client-only authorization was added.
+- Configured Auth.js to trust the Next.js host boundary explicitly, preventing `UntrustedHost` failures in both development and local production mode.
+- Kept Customer, Catalog, and Quote pages on their existing mock data.
+
+## Security controls
+
+- User identity is derived from the Auth.js server session and verified against PostgreSQL.
+- Registration email addresses are trimmed and lowercased; database uniqueness safely handles races.
+- Credential failures return a generic login error and credential verification never returns the password hash.
+- Redirect destinations accept only safe internal paths and avoid auth-page loops.
+- Onboarding derives the user and OWNER role on the server and creates organisation and membership in a serializable transaction with retry handling.
+- Active organisation selection is deterministic and requires an active organisation membership.
+- Requested organisation IDs are checked against both the authenticated user ID and organisation ID.
+- Role checks use explicit allowed-role lists; no implicit privilege hierarchy is assumed.
+- Prisma, credentials services, password helpers, and access helpers remain server-only.
 
 ## Validation
 
-- Prisma schema validation passes.
-- TypeScript validation passes.
-- ESLint passes.
-- Production build passes.
-- Unauthenticated `/onboarding` access redirects to `/login?callbackUrl=%2Fonboarding`.
-- An authenticated user without a membership can access the existing onboarding form.
-- Logged-out visits to all five protected route groups redirect to `/login`.
-- Authenticated users without an active organisation redirect to `/onboarding`.
-- Active members can access all protected route groups.
-- Login and signup redirect authenticated users to onboarding or dashboard according to membership state.
-- Onboarded users visiting onboarding redirect to the dashboard.
-- Cross-tenant organisation IDs are rejected; own-organisation access returns minimal membership details.
-- OWNER and ADMIN explicit role checks pass; MEMBER is rejected from an owner-only operation.
-- Inactive organisations are not selected and deleted-user sessions redirect to login.
-- Public landing, login, and signup routes remain accessible without a session.
-- The shell displays the authenticated user and active organisation without exposing other memberships.
-- Disposable test users, organisations, memberships, and test routes were removed after validation.
+- Prisma format, validate, generate, and migration status: passed; the database is up to date.
+- TypeScript validation: passed.
+- ESLint: passed.
+- Unit tests: 7 passed.
+- PostgreSQL integration tests: 4 passed; temporary test records removed.
+- Development seed: passed twice to verify idempotency.
+- Seed inspection: bcrypt-formatted hash, OWNER role, active organisation, and relationship verified without printing the hash.
+- Production build: passed.
+- Production start smoke test: passed with a configured local Auth.js origin; `/` returned 200 and logged-out `/dashboard` returned a 307 redirect to `/login`.
+- Playwright end-to-end tests: not configured; browser flow remains a manual check.
 
-## Not implemented in this sprint
+## Remaining limitations
 
-- Organisation switching or additional organisation creation
-- Feature-specific role policies and CRUD authorization
-- Password reset or email verification
-- Customer, catalog, quote, or quote-line-item database models
-
-Those business features continue to use the existing mock data.
+- No password reset, email verification, MFA, social login, or rate limiting.
+- No organisation switching or additional organisation creation UI.
+- No browser automation suite is configured.
+- Customers, Catalog, Quotes, and quote line items remain mock-data features.
 
 ## Next recommended sprint
 
-Implement the first organisation-scoped business-data feature, applying the
-shared access helpers to every server read and mutation.
+Implement the Customer backend and CRUD foundation. Add the Customer Prisma model and migration, organisation-scoped server reads and Server Actions, Zod validation, tenant-isolation tests, and loading, empty, error, and success states while reusing the existing customer UI.
