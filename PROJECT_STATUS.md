@@ -2,52 +2,59 @@
 
 ## Current sprint
 
-Sprint 6: Customer backend and CRUD.
+Sprint 7: Services Catalog backend.
 
 ## Completed
 
-- Added the organisation-owned Customer Prisma model and applied the `20260814095219_customer_backend` migration.
-- Added customer name, company, contact, tax, address, notes, archive, and timestamp fields with organisation and active-list indexes.
-- Replaced the customer list mock data with PostgreSQL reads scoped to the authenticated active organisation.
-- Added server-side customer search across name, company, email, and phone.
-- Added customer create, detail, edit, and soft-archive routes while preserving the existing application design system.
-- Added shared Zod validation with trimming, email normalisation, optional empty-string normalisation, phone validation, and field length limits.
-- Added server-only customer query and mutation services so pages remain thin and tenant behaviour is directly integration tested.
-- Added structured create, update, and archive Server Actions with pending states, field errors, general errors, route revalidation, and safe redirects.
-- Added safe not-found handling for both missing and cross-organisation customer IDs.
-- Removed the obsolete customer mock array; Catalog and Quotes remain mock-data features.
+- Added the organisation-owned CatalogItem Prisma model and applied the `20260814151111_catalog_backend` migration.
+- Added reusable item name, description, optional SKU, unit, exact unit-price and tax-rate decimals, active state, and timestamps.
+- Added organisation, active-list, name, and SKU indexes.
+- Replaced Catalog mock data with PostgreSQL reads scoped to the authenticated active organisation.
+- Added server-side catalog search across name, description, and SKU.
+- Added catalog create and edit routes plus soft archive while retaining the existing application design.
+- Added shared Zod validation for item details, supported units, optional SKU, non-negative prices, tax bounds, and exact two-decimal normalisation.
+- Added shared money formatting and exact decimal-bound utilities; Quote UI remains mock-backed but now reuses the formatter.
+- Added server-only catalog query and mutation services and structured Server Actions with field errors, general errors, pending states, and route revalidation.
+- Added safe unavailable handling for missing, inactive, and cross-organisation catalog item IDs.
+- Removed the obsolete catalog mock array. Quotes remain a mock-data feature.
+
+## Money strategy
+
+- Unit prices are stored as PostgreSQL `Decimal(19,2)` and tax rates as `Decimal(5,2)`.
+- Server validation accepts decimal strings only, allows at most two fractional digits, and checks bounds with integer-safe string conversion rather than JavaScript floating-point arithmetic.
+- Validated strings are converted to Prisma Decimal only inside the server-only catalog service.
+- Number conversion is limited to UI currency formatting and is not used as the canonical persisted value or for server calculations.
 
 ## Tenant security
 
-- The active organisation is derived from the authenticated server session for every page and action.
-- No customer form accepts `organizationId`, user ID, membership role, or archive state.
-- Customer detail reads use both customer ID and active organisation ID.
-- Updates and archives use `updateMany` constrained by customer ID, organisation ID, and active state.
-- Cross-organisation reads, updates, and archives return the same unavailable result without revealing record existence.
-- Archive is a soft update to `isArchived = true`; normal lists and searches exclude archived customers.
+- Every page and Server Action derives the active organisation from the authenticated server session.
+- Catalog forms do not accept `organizationId`, user ID, membership role, or `isActive`.
+- Catalog reads combine catalog item ID with active organisation ID.
+- Updates and archives use `updateMany` constrained by catalog item ID, organisation ID, and active state.
+- Cross-organisation reads, updates, and archives fail with the same unavailable result and do not reveal record existence.
+- Archive is a soft update to `isActive = false`; active lists and search exclude archived items.
 
 ## Validation
 
 - Prisma format: passed.
 - Prisma validate: passed.
 - Prisma Client generation: passed.
-- Customer migration: created and applied successfully.
+- Catalog migration: created and applied successfully.
 - TypeScript validation: passed.
+- Unit tests: 13 passed, including catalog validation and exact decimal bounds.
+- PostgreSQL integration tests: 14 passed, including catalog create, search, update, archive, exact decimal persistence, and tenant isolation.
 - ESLint: passed with no warnings.
-- Unit tests: 9 passed, including customer normalisation and invalid input.
-- PostgreSQL integration tests: 9 passed, including customer create, search, update, archive, and tenant isolation.
-- Production build: passed with all customer routes dynamically server-rendered.
-- Authenticated production-route smoke test: passed for login redirect, customer list, create form, search empty state, and safe missing-customer rendering.
-- Interactive browser CRUD validation: not available in this session because no browser instance was connected; mutation behaviour is covered by the PostgreSQL integration suite.
+- Production build: passed after replacing the build-time Google Fonts dependency with a local system-font stack.
+- Interactive browser CRUD validation: pending; automated mutation and tenant behaviour is covered by the PostgreSQL integration suite.
 
 ## Remaining limitations
 
-- Customer pagination is not implemented because the existing UI did not include pagination; the MVP list is capped at 100 active records.
-- Archived-customer browsing and restore are not implemented.
-- Quote counts and quote history remain empty until the Quote backend exists.
-- Catalog and Quotes continue using mock data.
-- Organisation switching, password reset, email verification, MFA, and rate limiting remain future work.
+- Catalog pagination is not implemented because the existing UI did not include pagination; the MVP list is capped at 100 active records.
+- Archived-item browsing and restore are not implemented.
+- The supported unit list is intentionally fixed for the MVP.
+- Organisation switching remains future work.
+- Quotes remain mock-backed; no quote, quote-item, total, or status persistence was added.
 
 ## Next recommended sprint
 
-Implement the Catalog backend and organisation-scoped CRUD foundation, including decimal-safe pricing, product/service validation, archive behaviour, tenant-isolation tests, and integration with the existing Catalog UI.
+Implement the Quote backend and CRUD foundation, including organisation-scoped customers and catalog selections, immutable line-item snapshots, decimal-safe totals and tax calculations, status rules, and tenant-isolation tests.

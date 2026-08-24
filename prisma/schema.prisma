@@ -65,13 +65,14 @@ model VerificationToken {
 }
 
 model Organization {
-  id          String       @id @default(cuid())
-  name        String
-  isActive    Boolean      @default(true)
-  memberships Membership[]
-  customers   Customer[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String        @id @default(cuid())
+  name         String
+  isActive     Boolean       @default(true)
+  memberships  Membership[]
+  customers    Customer[]
+  catalogItems CatalogItem[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Membership {
@@ -113,4 +114,24 @@ model Customer {
   @@index([organizationId])
   @@index([organizationId, isArchived])
   @@index([organizationId, name])
+}
+
+model CatalogItem {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  description    String
+  sku            String?
+  unit           String
+  unitPrice      Decimal      @db.Decimal(19, 2)
+  taxRate        Decimal      @db.Decimal(5, 2)
+  isActive       Boolean      @default(true)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([organizationId, isActive])
+  @@index([organizationId, name])
+  @@index([organizationId, sku])
 }

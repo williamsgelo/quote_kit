@@ -75,7 +75,13 @@ Customers are persisted in PostgreSQL and always belong to one organisation. The
 
 Customer pages resolve the active organisation from the authenticated server session. Customer IDs from route parameters are always queried together with that organisation ID; a missing or cross-organisation record returns the same not-found response. Customer mutations use Server Actions with shared Zod validation and never accept an organisation ID from the browser.
 
-Catalog and Quote pages continue using mock data until their respective backend sprints.
+## Catalog management
+
+Catalog items are persisted in PostgreSQL and scoped to the active organisation. The `/catalog` routes support active-item listing, server-side search, create, edit, and soft archive. Archived items remain stored for future historical quote relationships but are excluded from the normal catalog list and future quote selectors.
+
+Unit prices use PostgreSQL `Decimal(19,2)` and tax rates use `Decimal(5,2)`. Form values are validated and normalised as decimal strings before conversion to Prisma Decimal values; persisted financial values never use JavaScript floating-point numbers as their source of truth. Catalog mutations never accept an organisation ID or active state from the browser, and record reads, updates, and archives are constrained by the server-derived active organisation.
+
+Quote pages continue using mock data until the Quote backend sprint.
 
 ## Troubleshooting
 

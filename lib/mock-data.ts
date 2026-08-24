@@ -80,49 +80,6 @@ export const quotes: Quote[] = [
   },
 ];
 
-export const catalogItems = [
-  {
-    id: "item-1",
-    name: "Brand strategy workshop",
-    description: "Half-day discovery and positioning workshop",
-    category: "Strategy",
-    price: 8500,
-    status: "Active",
-  },
-  {
-    id: "item-2",
-    name: "Website design",
-    description: "Responsive five-page marketing website design",
-    category: "Design",
-    price: 28000,
-    status: "Active",
-  },
-  {
-    id: "item-3",
-    name: "Development retainer",
-    description: "Ten hours of frontend development support",
-    category: "Development",
-    price: 12000,
-    status: "Active",
-  },
-  {
-    id: "item-4",
-    name: "Copywriting",
-    description: "Conversion copy for one core website page",
-    category: "Content",
-    price: 4200,
-    status: "Active",
-  },
-  {
-    id: "item-5",
-    name: "Legacy hosting plan",
-    description: "Annual hosting on the previous infrastructure",
-    category: "Hosting",
-    price: 3600,
-    status: "Archived",
-  },
-];
-
 export const recentActivity = [
   {
     id: "act-1",
@@ -167,11 +124,3 @@ export const quoteLineItems = [
     unitPrice: 2800,
   },
 ];
-
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}

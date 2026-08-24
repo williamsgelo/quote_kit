@@ -1,4 +1,5 @@
-import { formatCurrency, quoteLineItems } from "@/lib/mock-data";
+import { formatCurrency } from "@/lib/money";
+import { quoteLineItems } from "@/lib/mock-data";
 
 export function QuoteSummary() {
   const subtotal = quoteLineItems.reduce(

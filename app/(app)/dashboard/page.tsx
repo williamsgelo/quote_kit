@@ -20,11 +20,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  formatCurrency,
-  quotes,
-  recentActivity,
-} from "@/lib/mock-data";
+import { formatCurrency } from "@/lib/money";
+import { quotes, recentActivity } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const activityTones: Record<string, string> = {

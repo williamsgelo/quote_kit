@@ -9,7 +9,8 @@ import {
   tableStyles,
 } from "@/components/shared/table-shell";
 import { Button } from "@/components/ui/button";
-import { formatCurrency, quotes } from "@/lib/mock-data";
+import { formatCurrency } from "@/lib/money";
+import { quotes } from "@/lib/mock-data";
 
 export default function QuotesPage() {
   return (
