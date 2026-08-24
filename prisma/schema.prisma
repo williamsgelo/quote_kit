@@ -13,6 +13,22 @@ enum MembershipRole {
   MEMBER
 }
 
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  CANCELLED
+}
+
+enum DiscountType {
+  NONE
+  PERCENTAGE
+  FIXED
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String?
@@ -65,14 +81,16 @@ model VerificationToken {
 }
 
 model Organization {
-  id           String        @id @default(cuid())
-  name         String
-  isActive     Boolean       @default(true)
-  memberships  Membership[]
-  customers    Customer[]
-  catalogItems CatalogItem[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  name            String
+  isActive        Boolean       @default(true)
+  nextQuoteNumber Int           @default(1)
+  memberships     Membership[]
+  customers       Customer[]
+  catalogItems    CatalogItem[]
+  quotes          Quote[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Membership {
@@ -108,6 +126,7 @@ model Customer {
   notes          String?
   isArchived     Boolean      @default(false)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  quotes         Quote[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -127,6 +146,7 @@ model CatalogItem {
   taxRate        Decimal      @db.Decimal(5, 2)
   isActive       Boolean      @default(true)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  quoteItems     QuoteItem[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -134,4 +154,71 @@ model CatalogItem {
   @@index([organizationId, isActive])
   @@index([organizationId, name])
   @@index([organizationId, sku])
+}
+
+model Quote {
+  id                   String       @id @default(cuid())
+  organizationId       String
+  customerId           String
+  quoteNumber          Int
+  status               QuoteStatus  @default(DRAFT)
+  issueDate            DateTime     @db.Date
+  expiryDate           DateTime     @db.Date
+  currency             String       @default("ZAR") @db.VarChar(3)
+  discountType         DiscountType @default(NONE)
+  discountValue        Decimal      @default(0) @db.Decimal(19, 2)
+  subtotal             Decimal      @db.Decimal(19, 2)
+  discountAmount       Decimal      @db.Decimal(19, 2)
+  taxTotal             Decimal      @db.Decimal(19, 2)
+  total                Decimal      @db.Decimal(19, 2)
+  customerName         String
+  customerCompanyName  String?
+  customerEmail        String?
+  customerPhone        String?
+  customerTaxNumber    String?
+  customerAddressLine1 String?
+  customerAddressLine2 String?
+  customerCity         String?
+  customerProvince     String?
+  customerPostalCode   String?
+  customerCountry      String?
+  customerMessage      String?      @db.Text
+  notes                String?      @db.Text
+  terms                String?      @db.Text
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer             Customer     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items                QuoteItem[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@unique([organizationId, quoteNumber])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, customerId])
+  @@index([customerId])
+}
+
+model QuoteItem {
+  id             String       @id @default(cuid())
+  quoteId        String
+  catalogItemId  String?
+  name           String
+  description    String
+  unit           String
+  quantity       Decimal      @db.Decimal(19, 4)
+  unitPrice      Decimal      @db.Decimal(19, 2)
+  taxRate        Decimal      @db.Decimal(5, 2)
+  position       Int
+  lineSubtotal   Decimal      @db.Decimal(19, 2)
+  discountAmount Decimal      @db.Decimal(19, 2)
+  taxAmount      Decimal      @db.Decimal(19, 2)
+  total          Decimal      @db.Decimal(19, 2)
+  quote          Quote        @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  catalogItem    CatalogItem? @relation(fields: [catalogItemId], references: [id], onDelete: SetNull)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([quoteId, position])
+  @@index([quoteId])
+  @@index([catalogItemId])
 }

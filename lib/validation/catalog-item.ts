@@ -1,24 +1,7 @@
 import { z } from "zod";
 
-import {
-  isDecimalAtMost,
-  normalizeDecimalString,
-} from "@/lib/money";
-
-const DECIMAL_PATTERN = /^\d+(?:\.\d{1,2})?$/;
-const MAX_UNIT_PRICE = "99999999999999999.99";
-
-const decimalField = (label: string, maximum: string) =>
-  z
-    .string()
-    .trim()
-    .min(1, `${label} is required.`)
-    .regex(DECIMAL_PATTERN, `${label} must have no more than 2 decimal places.`)
-    .refine(
-      (value) => isDecimalAtMost(value, maximum),
-      `${label} is too large.`,
-    )
-    .transform((value) => normalizeDecimalString(value));
+import { MAX_MONEY_VALUE } from "@/lib/money";
+import { decimalString } from "@/lib/validation/decimal";
 
 const optionalSku = z
   .preprocess(
@@ -59,8 +42,11 @@ export const catalogItemSchema = z.object({
     .max(1_000, "Description must be no more than 1000 characters."),
   sku: optionalSku,
   unit: z.enum(catalogUnits, "Select a valid unit."),
-  unitPrice: decimalField("Unit price", MAX_UNIT_PRICE),
-  taxRate: decimalField("Tax rate", "100.00"),
+  unitPrice: decimalString({
+    label: "Unit price",
+    maximum: MAX_MONEY_VALUE,
+  }),
+  taxRate: decimalString({ label: "Tax rate", maximum: "100.00" }),
 });
 
 export type CatalogItemInput = z.infer<typeof catalogItemSchema>;

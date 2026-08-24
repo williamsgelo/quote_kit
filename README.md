@@ -81,7 +81,15 @@ Catalog items are persisted in PostgreSQL and scoped to the active organisation.
 
 Unit prices use PostgreSQL `Decimal(19,2)` and tax rates use `Decimal(5,2)`. Form values are validated and normalised as decimal strings before conversion to Prisma Decimal values; persisted financial values never use JavaScript floating-point numbers as their source of truth. Catalog mutations never accept an organisation ID or active state from the browser, and record reads, updates, and archives are constrained by the server-derived active organisation.
 
-Quote pages continue using mock data until the Quote backend sprint.
+## Quote financial foundation
+
+Sprint 8A adds the PostgreSQL `Quote` and `QuoteItem` models, but the existing Quote pages intentionally remain mock-backed until Sprint 8B. Quotes store customer commercial identity and address snapshots. Quote items store name, description, unit, quantity, price, tax rate, and calculated totals independently of live Catalog values; the optional Catalog relation is retained only for traceability.
+
+Quote money uses PostgreSQL `Decimal(19,2)`, tax rates use `Decimal(5,2)`, and quantities use `Decimal(19,4)`. The shared server-only pricing engine calculates `line base → proportional quote discount → tax → final total` with Decimal `ROUND_HALF_UP`. Percentage and fixed discounts are allocated to lines before tax. Integer-cent largest-remainder allocation ensures fixed discounts remain exact across mixed tax rates without binary floating-point arithmetic.
+
+Each organisation owns an atomic `nextQuoteNumber` counter. The allocator increments that counter inside the future Quote creation transaction, and `organizationId + quoteNumber` has a database unique constraint. This allows every organisation to begin at quote number 1 while preventing concurrent collisions.
+
+Sprint 8B will connect the existing Quote UI to the validated draft preparation service and create Quote and QuoteItem records in the same transaction as number allocation.
 
 ## Troubleshooting
 

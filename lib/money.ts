@@ -1,5 +1,7 @@
 const DEFAULT_SCALE = 2;
 
+export const MAX_MONEY_VALUE = "99999999999999999.99";
+
 export function normalizeDecimalString(value: string, scale = DEFAULT_SCALE) {
   const [whole, fraction = ""] = value.split(".");
   return `${whole}.${fraction.padEnd(scale, "0")}`;
@@ -10,13 +12,24 @@ export function isDecimalAtMost(
   maximum: string,
   scale = DEFAULT_SCALE,
 ) {
-  const normalizedValue = normalizeDecimalString(value, scale).replace(".", "");
-  const normalizedMaximum = normalizeDecimalString(maximum, scale).replace(
-    ".",
-    "",
+  return (
+    decimalToScaledBigInt(value, scale) <=
+    decimalToScaledBigInt(maximum, scale)
   );
+}
 
-  return BigInt(normalizedValue) <= BigInt(normalizedMaximum);
+export function decimalToScaledBigInt(
+  value: string,
+  scale = DEFAULT_SCALE,
+) {
+  return BigInt(normalizeDecimalString(value, scale).replace(".", ""));
+}
+
+export function isDecimalGreaterThanZero(
+  value: string,
+  scale = DEFAULT_SCALE,
+) {
+  return decimalToScaledBigInt(value, scale) > BigInt(0);
 }
 
 export function formatCurrency(
