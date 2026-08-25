@@ -60,7 +60,7 @@ function SidebarContent({
       </div>
       <div className="px-3 pt-4">
         <Link
-          href="/quotes"
+          href="/quotes/new"
           onClick={onNavigate}
           className={cn(
             buttonVariants({ size: "lg" }),

@@ -36,12 +36,12 @@ function quoteInput(customerId: string, catalogItemId: string | null) {
     items: [
       {
         catalogItemId,
-        name: "Untrusted browser name",
-        description: "Untrusted browser description",
-        unit: "each",
+        name: "Customised consulting",
+        description: "Quote-specific delivery scope",
+        unit: "hour",
         quantity: "1.5000",
-        unitPrice: "0.01",
-        taxRate: "0.00",
+        unitPrice: "900.00",
+        taxRate: "15.00",
       },
     ],
   };
@@ -124,7 +124,7 @@ after(async () => {
   await prisma.$disconnect();
 });
 
-test("draft preparation snapshots trusted customer and catalog values", async () => {
+test("draft preparation snapshots customer data and editable quote-line values", async () => {
   const prepared = await prepareQuoteDraftForOrganization(
     organizationAId,
     quoteInput(customerAId, catalogItemAId),
@@ -133,16 +133,16 @@ test("draft preparation snapshots trusted customer and catalog values", async ()
   assert.equal(prepared.quote.customerName, "Alpha Customer");
   assert.equal(prepared.quote.customerCompanyName, "Alpha Company");
   assert.equal(prepared.quote.customerTaxNumber, "ALPHA-TAX");
-  assert.equal(prepared.items[0].name, "Alpha Consulting");
-  assert.equal(prepared.items[0].description, "Original catalog description");
+  assert.equal(prepared.items[0].name, "Customised consulting");
+  assert.equal(prepared.items[0].description, "Quote-specific delivery scope");
   assert.equal(prepared.items[0].unit, "hour");
-  assert.equal(prepared.items[0].unitPrice, "850.00");
+  assert.equal(prepared.items[0].unitPrice, "900.00");
   assert.equal(prepared.items[0].taxRate, "15.00");
   assert.equal(prepared.items[0].quantity, "1.5000");
-  assert.equal(prepared.quote.subtotal, "1275.00");
-  assert.equal(prepared.quote.discountAmount, "127.50");
-  assert.equal(prepared.quote.taxTotal, "172.13");
-  assert.equal(prepared.quote.total, "1319.63");
+  assert.equal(prepared.quote.subtotal, "1350.00");
+  assert.equal(prepared.quote.discountAmount, "135.00");
+  assert.equal(prepared.quote.taxTotal, "182.25");
+  assert.equal(prepared.quote.total, "1397.25");
 
   const created = await prisma.$transaction(async (transaction) => {
     const quoteNumber = await allocateNextQuoteNumber(
@@ -203,7 +203,7 @@ test("draft preparation snapshots trusted customer and catalog values", async ()
   assert.equal(created.quoteNumber, 1);
   assert.equal(formatQuoteNumber(created.quoteNumber), "Q-000001");
   assert.equal(created.items[0].quantity.toFixed(4), "1.5000");
-  assert.equal(created.items[0].unitPrice.toFixed(2), "850.00");
+  assert.equal(created.items[0].unitPrice.toFixed(2), "900.00");
 
   await Promise.all([
     prisma.customer.update({
@@ -222,8 +222,8 @@ test("draft preparation snapshots trusted customer and catalog values", async ()
 
   assert.equal(historicalQuote.customerName, "Alpha Customer");
   assert.equal(historicalQuote.customerCompanyName, "Alpha Company");
-  assert.equal(historicalQuote.items[0].name, "Alpha Consulting");
-  assert.equal(historicalQuote.items[0].unitPrice.toFixed(2), "850.00");
+  assert.equal(historicalQuote.items[0].name, "Customised consulting");
+  assert.equal(historicalQuote.items[0].unitPrice.toFixed(2), "900.00");
 });
 
 test("custom quote items remain independent of Catalog", async () => {

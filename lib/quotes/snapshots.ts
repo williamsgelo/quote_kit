@@ -1,7 +1,7 @@
 import "server-only";
 
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { catalogUnits } from "@/lib/validation/catalog-item";
 import type { QuoteInput } from "@/lib/validation/quote";
 
 export class QuoteReferenceError extends Error {
@@ -28,34 +28,35 @@ const customerSnapshotSelect = {
 
 const catalogSnapshotSelect = {
   id: true,
-  name: true,
-  description: true,
-  unit: true,
-  unitPrice: true,
-  taxRate: true,
 } as const;
 
-function isCatalogUnit(value: string): value is (typeof catalogUnits)[number] {
-  return catalogUnits.some((unit) => unit === value);
-}
+type SnapshotDatabase = Pick<
+  Prisma.TransactionClient,
+  "customer" | "catalogItem"
+>;
 
-function getValidatedCatalogUnit(value: string) {
-  if (!isCatalogUnit(value)) {
-    throw new QuoteReferenceError();
-  }
-  return value;
-}
+type QuoteSnapshotOptions = {
+  database?: SnapshotDatabase;
+  allowArchivedCustomerId?: string;
+  allowInactiveCatalogItemIds?: readonly string[];
+};
 
 /**
  * Resolves customer and optional CatalogItem references using the trusted
- * active organisation. Catalog-backed line values are copied from PostgreSQL;
- * custom lines retain their validated submitted values. Returned snapshots are
- * plain strings and remain independent of later Customer or CatalogItem edits.
+ * active organisation. Catalog-backed lines retain their validated,
+ * quote-specific editable values after the Catalog reference is verified.
+ * Returned snapshots are plain strings and remain independent of later
+ * Customer or CatalogItem edits.
  */
 export async function getQuoteSnapshotsForOrganization(
   organizationId: string,
   input: QuoteInput,
+  options: QuoteSnapshotOptions = {},
 ) {
+  const database = options.database ?? prisma;
+  const allowedInactiveCatalogIds = [
+    ...new Set(options.allowInactiveCatalogItemIds ?? []),
+  ];
   const catalogItemIds = [
     ...new Set(
       input.items
@@ -64,20 +65,29 @@ export async function getQuoteSnapshotsForOrganization(
     ),
   ];
   const [customer, catalogItems] = await Promise.all([
-    prisma.customer.findFirst({
+    database.customer.findFirst({
       where: {
         id: input.customerId,
         organizationId,
-        isArchived: false,
+        ...(input.customerId === options.allowArchivedCustomerId
+          ? {}
+          : { isArchived: false }),
       },
       select: customerSnapshotSelect,
     }),
     catalogItemIds.length
-      ? prisma.catalogItem.findMany({
+      ? database.catalogItem.findMany({
           where: {
             id: { in: catalogItemIds },
             organizationId,
-            isActive: true,
+            ...(allowedInactiveCatalogIds.length
+              ? {
+                  OR: [
+                    { isActive: true },
+                    { id: { in: allowedInactiveCatalogIds } },
+                  ],
+                }
+              : { isActive: true }),
           },
           select: catalogSnapshotSelect,
         })
@@ -93,24 +103,19 @@ export async function getQuoteSnapshotsForOrganization(
     const catalogItem = item.catalogItemId
       ? catalogById.get(item.catalogItemId)
       : null;
-    const catalogUnit = catalogItem?.unit;
 
     if (item.catalogItemId && !catalogItem) {
       throw new QuoteReferenceError();
     }
 
-    const unit = catalogUnit
-      ? getValidatedCatalogUnit(catalogUnit)
-      : item.unit;
-
     return {
       catalogItemId: catalogItem?.id ?? null,
-      name: catalogItem?.name ?? item.name,
-      description: catalogItem?.description ?? item.description,
-      unit,
+      name: item.name,
+      description: item.description,
+      unit: item.unit,
       quantity: item.quantity,
-      unitPrice: catalogItem?.unitPrice.toFixed(2) ?? item.unitPrice,
-      taxRate: catalogItem?.taxRate.toFixed(2) ?? item.taxRate,
+      unitPrice: item.unitPrice,
+      taxRate: item.taxRate,
       position: index + 1,
     };
   });

@@ -20,25 +20,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+import { requireOrganization } from "@/lib/auth/access";
 import { formatCurrency } from "@/lib/money";
-import { quotes, recentActivity } from "@/lib/mock-data";
+import { formatQuoteNumber } from "@/lib/quotes/numbering";
+import { getQuoteDashboardForOrganization } from "@/lib/quotes/queries";
 import { cn } from "@/lib/utils";
 
-const activityTones: Record<string, string> = {
-  blue: "bg-blue-500",
-  emerald: "bg-emerald-500",
-  violet: "bg-violet-500",
-};
+export default async function DashboardPage() {
+  const { organization, user } = await requireOrganization();
+  const dashboard = await getQuoteDashboardForOrganization(organization.id);
+  const firstName = user.name?.trim().split(/\s+/)[0] || "there";
 
-export default function DashboardPage() {
   return (
     <div className="space-y-7">
       <PageHeader
-        title="Good morning, Gabriel"
+        title={`Good morning, ${firstName}`}
         description="Here’s what’s happening with your quotes and customers today."
         actions={
           <Link
-            href="/quotes"
+            href="/quotes/new"
             className={cn(buttonVariants({ size: "lg" }), "h-9 px-3")}
           >
             <Plus className="size-4" aria-hidden="true" />
@@ -53,28 +53,30 @@ export default function DashboardPage() {
       >
         <StatCard
           label="Total quotes"
-          value="48"
-          change="8 created this month"
+          value={dashboard.totalQuotes.toString()}
+          change="Organisation quote records"
           icon={FileText}
         />
         <StatCard
           label="Draft quotes"
-          value="7"
-          change="2 updated this week"
+          value={dashboard.draftQuotes.toString()}
+          change="Drafts available to edit"
           icon={Clock3}
           iconClassName="bg-amber-50 text-amber-700"
         />
         <StatCard
           label="Accepted quotes"
-          value="29"
-          change="60.4% acceptance rate"
+          value={dashboard.acceptedQuotes.toString()}
+          change="Delivery workflows come next"
           icon={CheckCircle2}
           iconClassName="bg-emerald-50 text-emerald-700"
         />
         <StatCard
           label="Total quote value"
-          value="R 412,850"
-          change="12.5% from last month"
+          value={formatCurrency(dashboard.totalValue, {
+            minimumFractionDigits: 2,
+          })}
+          change="Current persisted quote value"
           icon={DollarSign}
           iconClassName="bg-violet-50 text-violet-700"
         />
@@ -86,7 +88,7 @@ export default function DashboardPage() {
             <div>
               <CardTitle>Recent quotes</CardTitle>
               <CardDescription className="mt-1">
-                Your latest customer proposals
+                Your latest customer drafts
               </CardDescription>
             </div>
             <Link
@@ -108,7 +110,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {quotes.slice(0, 4).map((quote) => (
+                {dashboard.recentQuotes.map((quote) => (
                   <tr
                     key={quote.id}
                     className="border-b last:border-0 hover:bg-muted/25"
@@ -118,23 +120,35 @@ export default function DashboardPage() {
                         href={`/quotes/${quote.id}`}
                         className="font-medium hover:text-primary hover:underline"
                       >
-                        {quote.number}
+                        {formatQuoteNumber(quote.quoteNumber)}
                       </Link>
                     </td>
                     <td className="px-4 py-3.5">
-                      <p className="font-medium">{quote.customer}</p>
+                      <p className="font-medium">{quote.customerName}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {quote.company}
+                        {quote.customerCompanyName || "Individual customer"}
                       </p>
                     </td>
                     <td className="px-4 py-3.5">
                       <StatusBadge status={quote.status} />
                     </td>
                     <td className="px-5 py-3.5 text-right font-medium">
-                      {formatCurrency(quote.total)}
+                      {formatCurrency(quote.total.toString(), {
+                        minimumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))}
+                {dashboard.recentQuotes.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-5 py-10 text-center text-sm text-muted-foreground"
+                    >
+                      No quotes yet. Create the first draft for this organisation.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -148,7 +162,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="grid gap-2">
               <Link
-                href="/quotes"
+                href="/quotes/new"
                 className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium transition-colors hover:bg-muted/50"
               >
                 <span className="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
@@ -157,7 +171,7 @@ export default function DashboardPage() {
                 Create a quote
               </Link>
               <Link
-                href="/customers"
+                href="/customers/new"
                 className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium transition-colors hover:bg-muted/50"
               >
                 <span className="flex size-8 items-center justify-center rounded-lg bg-violet-50 text-violet-700">
@@ -173,29 +187,13 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>Recent activity</CardTitle>
-          <CardDescription>
-            Updates from across your workspace
-          </CardDescription>
+          <CardDescription>Quote delivery activity is not enabled yet</CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="grid gap-5 md:grid-cols-3">
-            {recentActivity.map((activity) => (
-              <li key={activity.id} className="flex gap-3">
-                <span
-                  className={cn(
-                    "mt-1.5 size-2 shrink-0 rounded-full ring-4 ring-muted",
-                    activityTones[activity.tone],
-                  )}
-                />
-                <div>
-                  <p className="text-sm font-medium">{activity.title}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {activity.detail}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <p className="text-sm text-muted-foreground">
+            Sent, viewed, accepted, and declined activity will appear here after
+            the Quote delivery sprint.
+          </p>
         </CardContent>
       </Card>
     </div>

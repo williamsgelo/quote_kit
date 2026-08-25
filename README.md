@@ -81,15 +81,17 @@ Catalog items are persisted in PostgreSQL and scoped to the active organisation.
 
 Unit prices use PostgreSQL `Decimal(19,2)` and tax rates use `Decimal(5,2)`. Form values are validated and normalised as decimal strings before conversion to Prisma Decimal values; persisted financial values never use JavaScript floating-point numbers as their source of truth. Catalog mutations never accept an organisation ID or active state from the browser, and record reads, updates, and archives are constrained by the server-derived active organisation.
 
-## Quote financial foundation
+## Draft quote management
 
-Sprint 8A adds the PostgreSQL `Quote` and `QuoteItem` models, but the existing Quote pages intentionally remain mock-backed until Sprint 8B. Quotes store customer commercial identity and address snapshots. Quote items store name, description, unit, quantity, price, tax rate, and calculated totals independently of live Catalog values; the optional Catalog relation is retained only for traceability.
+Quotes and QuoteItems are persisted in PostgreSQL. The `/quotes` routes provide organisation-scoped list/search, draft creation, detail, and DRAFT-only editing. New quote forms load active Customers and CatalogItems from the current organisation and also support custom lines with no Catalog relation. Archived Customers and inactive CatalogItems are unavailable for new quotes.
+
+Customer identity/address fields and every commercial line value are copied onto the Quote at save time. A Catalog reference is optional traceability only: users may customise the copied line without changing Catalog, and later Customer or Catalog changes do not mutate the persisted Quote snapshot. An existing draft may retain its currently linked archived Customer or inactive CatalogItem while editing, but cannot introduce a different unavailable record.
 
 Quote money uses PostgreSQL `Decimal(19,2)`, tax rates use `Decimal(5,2)`, and quantities use `Decimal(19,4)`. The shared server-only pricing engine calculates `line base → proportional quote discount → tax → final total` with Decimal `ROUND_HALF_UP`. Percentage and fixed discounts are allocated to lines before tax. Integer-cent largest-remainder allocation ensures fixed discounts remain exact across mixed tax rates without binary floating-point arithmetic.
 
-Each organisation owns an atomic `nextQuoteNumber` counter. The allocator increments that counter inside the future Quote creation transaction, and `organizationId + quoteNumber` has a database unique constraint. This allows every organisation to begin at quote number 1 while preventing concurrent collisions.
+Each organisation owns an atomic `nextQuoteNumber` counter. Draft creation validates tenant-owned references, calculates totals, reserves the number, and creates the Quote plus QuoteItems in one serializable transaction. Failed writes roll back the counter, and the `organizationId + quoteNumber` database constraint is the final collision safeguard. Edits replace line items atomically and preserve the original quote number.
 
-Sprint 8B will connect the existing Quote UI to the validated draft preparation service and create Quote and QuoteItem records in the same transaction as number allocation.
+Browser-submitted organisation IDs, quote numbers, statuses, and totals are ignored. Server Actions resolve the active organisation from the authenticated session, validate Customer and Catalog ownership again, run the canonical pricing engine, and persist only server-calculated totals. Non-DRAFT and cross-organisation updates are rejected server-side.
 
 ## Troubleshooting
 

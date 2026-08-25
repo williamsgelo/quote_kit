@@ -223,7 +223,7 @@ export default async function CustomerDetailPage({
               <EmptyState
                 icon={ReceiptText}
                 title="No database quotes yet"
-                description="Quote data remains a mock-data feature until the Quotes backend sprint."
+                description="Quotes created for this customer will appear in the Quotes workspace."
               />
             </CardContent>
           </Card>
