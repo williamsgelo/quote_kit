@@ -104,8 +104,17 @@ export function getQuoteForOrganization(
         customerMessage: true,
         notes: true,
         terms: true,
+        publicToken: true,
+        sentAt: true,
+        firstViewedAt: true,
+        acceptedAt: true,
+        declinedAt: true,
         createdAt: true,
         updatedAt: true,
+        activities: {
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          select: { id: true, type: true, createdAt: true },
+        },
         items: {
           orderBy: [{ position: "asc" }, { id: "asc" }],
           select: {
@@ -215,17 +224,34 @@ export async function getDraftQuoteForEditing(
 
 export function getQuoteDashboardForOrganization(organizationId: string) {
   return retryTransientDatabaseRead(async () => {
-    const [totalQuotes, draftQuotes, acceptedQuotes, value, recentQuotes] =
-      await Promise.all([
+    const [
+      totalQuotes,
+      draftQuotes,
+      awaitingResponse,
+      acceptedQuotes,
+      declinedQuotes,
+      acceptedValue,
+      recentQuotes,
+      recentActivities,
+    ] = await Promise.all([
         prisma.quote.count({ where: { organizationId } }),
         prisma.quote.count({
           where: { organizationId, status: QuoteStatus.DRAFT },
         }),
         prisma.quote.count({
+          where: {
+            organizationId,
+            status: { in: [QuoteStatus.SENT, QuoteStatus.VIEWED] },
+          },
+        }),
+        prisma.quote.count({
           where: { organizationId, status: QuoteStatus.ACCEPTED },
         }),
+        prisma.quote.count({
+          where: { organizationId, status: QuoteStatus.DECLINED },
+        }),
         prisma.quote.aggregate({
-          where: { organizationId },
+          where: { organizationId, status: QuoteStatus.ACCEPTED },
           _sum: { total: true },
         }),
         prisma.quote.findMany({
@@ -241,14 +267,39 @@ export function getQuoteDashboardForOrganization(organizationId: string) {
             total: true,
           },
         }),
+        prisma.quoteActivity.findMany({
+          where: { quote: { organizationId } },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: 6,
+          select: {
+            id: true,
+            type: true,
+            createdAt: true,
+            quote: {
+              select: {
+                id: true,
+                quoteNumber: true,
+                customerName: true,
+              },
+            },
+          },
+        }),
       ]);
+
+    const decidedQuotes = acceptedQuotes + declinedQuotes;
+    const conversionRate =
+      decidedQuotes === 0 ? "0.0" : ((acceptedQuotes / decidedQuotes) * 100).toFixed(1);
 
     return {
       totalQuotes,
       draftQuotes,
+      awaitingResponse,
       acceptedQuotes,
-      totalValue: value._sum.total?.toFixed(2) ?? "0.00",
+      declinedQuotes,
+      conversionRate,
+      acceptedValue: acceptedValue._sum.total?.toFixed(2) ?? "0.00",
       recentQuotes,
+      recentActivities,
     };
   });
 }

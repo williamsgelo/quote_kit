@@ -29,6 +29,15 @@ enum DiscountType {
   FIXED
 }
 
+enum QuoteActivityType {
+  CREATED
+  UPDATED
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+}
+
 model User {
   id            String       @id @default(cuid())
   name          String?
@@ -157,20 +166,20 @@ model CatalogItem {
 }
 
 model Quote {
-  id                   String       @id @default(cuid())
+  id                   String          @id @default(cuid())
   organizationId       String
   customerId           String
   quoteNumber          Int
-  status               QuoteStatus  @default(DRAFT)
-  issueDate            DateTime     @db.Date
-  expiryDate           DateTime     @db.Date
-  currency             String       @default("ZAR") @db.VarChar(3)
-  discountType         DiscountType @default(NONE)
-  discountValue        Decimal      @default(0) @db.Decimal(19, 2)
-  subtotal             Decimal      @db.Decimal(19, 2)
-  discountAmount       Decimal      @db.Decimal(19, 2)
-  taxTotal             Decimal      @db.Decimal(19, 2)
-  total                Decimal      @db.Decimal(19, 2)
+  status               QuoteStatus     @default(DRAFT)
+  issueDate            DateTime        @db.Date
+  expiryDate           DateTime        @db.Date
+  currency             String          @default("ZAR") @db.VarChar(3)
+  discountType         DiscountType    @default(NONE)
+  discountValue        Decimal         @default(0) @db.Decimal(19, 2)
+  subtotal             Decimal         @db.Decimal(19, 2)
+  discountAmount       Decimal         @db.Decimal(19, 2)
+  taxTotal             Decimal         @db.Decimal(19, 2)
+  total                Decimal         @db.Decimal(19, 2)
   customerName         String
   customerCompanyName  String?
   customerEmail        String?
@@ -182,20 +191,36 @@ model Quote {
   customerProvince     String?
   customerPostalCode   String?
   customerCountry      String?
-  customerMessage      String?      @db.Text
-  notes                String?      @db.Text
-  terms                String?      @db.Text
-  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  customer             Customer     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customerMessage      String?         @db.Text
+  notes                String?         @db.Text
+  terms                String?         @db.Text
+  publicToken          String?         @unique @db.VarChar(64)
+  sentAt               DateTime?
+  firstViewedAt        DateTime?
+  acceptedAt           DateTime?
+  declinedAt           DateTime?
+  organization         Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer             Customer        @relation(fields: [customerId], references: [id], onDelete: Restrict)
   items                QuoteItem[]
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+  activities           QuoteActivity[]
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
 
   @@unique([organizationId, quoteNumber])
   @@index([organizationId])
   @@index([organizationId, status])
   @@index([organizationId, customerId])
   @@index([customerId])
+}
+
+model QuoteActivity {
+  id        String            @id @default(cuid())
+  quoteId   String
+  type      QuoteActivityType
+  quote     Quote             @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+
+  @@index([quoteId, createdAt])
 }
 
 model QuoteItem {

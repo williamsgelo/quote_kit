@@ -1,6 +1,10 @@
 import "server-only";
 
-import { QuoteStatus, type Prisma } from "@/generated/prisma/client";
+import {
+  QuoteActivityType,
+  QuoteStatus,
+  type Prisma,
+} from "@/generated/prisma/client";
 import { toDatabaseDecimal } from "@/lib/money/server";
 import { runSerializableTransaction } from "@/lib/prisma-transaction";
 import { allocateNextQuoteNumber } from "@/lib/quotes/numbering";
@@ -156,6 +160,7 @@ export function createDraftQuoteForOrganization(
         quoteNumber,
         ...quoteData(prepared),
         items: { create: quoteItemsData(prepared) },
+        activities: { create: { type: QuoteActivityType.CREATED } },
       },
       select: { id: true, quoteNumber: true },
     });
@@ -203,6 +208,7 @@ export function updateDraftQuoteForOrganization(
           deleteMany: {},
           create: quoteItemsData(prepared),
         },
+        activities: { create: { type: QuoteActivityType.UPDATED } },
       },
       select: { id: true, quoteNumber: true },
     });

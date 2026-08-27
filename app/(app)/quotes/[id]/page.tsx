@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Copy, Download, Edit3, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, Copy, Download, Edit3, MapPin } from "lucide-react";
 
 import { QuoteStatus } from "@/generated/prisma/client";
+import { QuoteDeliveryActions } from "@/components/quotes/quote-delivery-actions";
 import { QuoteLineItems } from "@/components/quotes/quote-line-items";
 import { QuoteSummary } from "@/components/quotes/quote-summary";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/access";
+import { quoteActivityLabel } from "@/lib/quotes/activity";
+import { buildPublicQuoteUrl } from "@/lib/quotes/delivery-service";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
 import { getQuoteForOrganization } from "@/lib/quotes/queries";
 import { cn } from "@/lib/utils";
@@ -19,6 +22,13 @@ function formatDate(date: Date) {
     month: "short",
     year: "numeric",
     timeZone: "UTC",
+  }).format(date);
+}
+
+function formatDateTime(date: Date) {
+  return new Intl.DateTimeFormat("en-ZA", {
+    dateStyle: "medium",
+    timeStyle: "short",
   }).format(date);
 }
 
@@ -36,6 +46,14 @@ export default async function QuoteDetailPage({
   }
 
   const number = formatQuoteNumber(quote.quoteNumber);
+  let publicUrl: string | null = null;
+  if (quote.publicToken && quote.status !== QuoteStatus.DRAFT) {
+    try {
+      publicUrl = buildPublicQuoteUrl(quote.publicToken);
+    } catch {
+      publicUrl = null;
+    }
+  }
   const address = [
     quote.customerAddressLine1,
     quote.customerAddressLine2,
@@ -102,16 +120,11 @@ export default async function QuoteDetailPage({
                 Edit
               </Link>
             )}
-            <Button
-              type="button"
-              size="lg"
-              className="h-9"
-              disabled
-              title="Quote delivery is planned for the next sprint"
-            >
-              <Mail className="size-4" aria-hidden="true" />
-              Send quote
-            </Button>
+            <QuoteDeliveryActions
+              quoteId={quote.id}
+              canSend={quote.status === QuoteStatus.DRAFT}
+              initialPublicUrl={publicUrl}
+            />
           </div>
         </div>
       </div>
@@ -237,6 +250,36 @@ export default async function QuoteDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardContent className="p-5">
+          <h2 className="text-sm font-semibold">Activity history</h2>
+          {quote.activities.length ? (
+            <ol className="mt-4 space-y-4">
+              {quote.activities.map((activity) => (
+                <li key={activity.id} className="flex items-start gap-3 text-sm">
+                  <span
+                    className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <p className="font-medium">
+                      {quoteActivityLabel(activity.type)}
+                    </p>
+                    <time className="text-xs text-muted-foreground">
+                      {formatDateTime(activity.createdAt)}
+                    </time>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="mt-2 text-sm text-muted-foreground">
+              No activity has been recorded for this quote yet.
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

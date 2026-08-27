@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { requireOrganization } from "@/lib/auth/access";
+import { EmailConfigurationError } from "@/lib/email/config";
+import { EmailDeliveryError } from "@/lib/email/resend";
+import {
+  QuoteSendError,
+  sendQuoteForOrganization,
+} from "@/lib/quotes/delivery-service";
 import { QuotePricingError } from "@/lib/quotes/pricing";
 import {
   createDraftQuoteForOrganization,
@@ -12,6 +18,7 @@ import {
   updateDraftQuoteForOrganization,
 } from "@/lib/quotes/service";
 import { QuoteReferenceError } from "@/lib/quotes/snapshots";
+import { QuoteTransitionError } from "@/lib/quotes/transitions";
 import { quoteSchema } from "@/lib/validation/quote";
 
 export type QuoteActionState = {
@@ -19,6 +26,12 @@ export type QuoteActionState = {
   message?: string;
   quoteId?: string;
   fieldErrors?: Record<string, string[]>;
+};
+
+export type QuoteDeliveryActionState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+  publicUrl?: string;
 };
 
 function parsedPayload(formData: FormData) {
@@ -158,6 +171,43 @@ export async function updateDraftQuoteAction(
     return {
       status: "error",
       message: "We could not update the draft quote. Please try again.",
+    };
+  }
+}
+
+export async function sendQuoteAction(
+  quoteId: string,
+  _previousState: QuoteDeliveryActionState,
+): Promise<QuoteDeliveryActionState> {
+  void _previousState;
+  const { organization } = await requireOrganization({ behavior: "throw" });
+
+  try {
+    const sent = await sendQuoteForOrganization(organization.id, quoteId);
+
+    revalidatePath("/dashboard");
+    revalidatePath("/quotes");
+    revalidatePath(`/quotes/${sent.id}`);
+
+    return {
+      status: "success",
+      message: "Quote sent successfully.",
+      publicUrl: sent.publicUrl,
+    };
+  } catch (error) {
+    if (
+      error instanceof QuoteSendError ||
+      error instanceof QuoteTransitionError ||
+      error instanceof EmailConfigurationError ||
+      error instanceof EmailDeliveryError
+    ) {
+      return { status: "error", message: error.message };
+    }
+
+    reportQuoteError("send", error);
+    return {
+      status: "error",
+      message: "We could not send the quote. Please try again.",
     };
   }
 }

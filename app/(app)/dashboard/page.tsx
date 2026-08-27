@@ -1,11 +1,11 @@
 import Link from "next/link";
 import {
   CheckCircle2,
-  Clock3,
   DollarSign,
   FilePlus2,
   FileText,
   Plus,
+  Send,
   UserPlus,
 } from "lucide-react";
 
@@ -23,6 +23,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { requireOrganization } from "@/lib/auth/access";
 import { formatCurrency } from "@/lib/money";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
+import { quoteActivityLabel } from "@/lib/quotes/activity";
 import { getQuoteDashboardForOrganization } from "@/lib/quotes/queries";
 import { cn } from "@/lib/utils";
 
@@ -58,25 +59,25 @@ export default async function DashboardPage() {
           icon={FileText}
         />
         <StatCard
-          label="Draft quotes"
-          value={dashboard.draftQuotes.toString()}
-          change="Drafts available to edit"
-          icon={Clock3}
+          label="Awaiting response"
+          value={dashboard.awaitingResponse.toString()}
+          change="Sent or viewed quotes"
+          icon={Send}
           iconClassName="bg-amber-50 text-amber-700"
         />
         <StatCard
           label="Accepted quotes"
           value={dashboard.acceptedQuotes.toString()}
-          change="Delivery workflows come next"
+          change={`${dashboard.conversionRate}% decided conversion`}
           icon={CheckCircle2}
           iconClassName="bg-emerald-50 text-emerald-700"
         />
         <StatCard
-          label="Total quote value"
-          value={formatCurrency(dashboard.totalValue, {
+          label="Accepted value"
+          value={formatCurrency(dashboard.acceptedValue, {
             minimumFractionDigits: 2,
           })}
-          change="Current persisted quote value"
+          change="Accepted commercial value"
           icon={DollarSign}
           iconClassName="bg-violet-50 text-violet-700"
         />
@@ -187,13 +188,41 @@ export default async function DashboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>Recent activity</CardTitle>
-          <CardDescription>Quote delivery activity is not enabled yet</CardDescription>
+          <CardDescription>Latest Quote workflow events</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Sent, viewed, accepted, and declined activity will appear here after
-            the Quote delivery sprint.
-          </p>
+          {dashboard.recentActivities.length ? (
+            <ol className="space-y-4">
+              {dashboard.recentActivities.map((activity) => (
+                <li key={activity.id} className="flex items-start gap-3 text-sm">
+                  <span
+                    className="mt-1.5 size-2 shrink-0 rounded-full bg-primary"
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0">
+                    <Link
+                      href={`/quotes/${activity.quote.id}`}
+                      className="font-medium hover:text-primary hover:underline"
+                    >
+                      {quoteActivityLabel(activity.type)} ·{" "}
+                      {formatQuoteNumber(activity.quote.quoteNumber)}
+                    </Link>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {activity.quote.customerName} ·{" "}
+                      {new Intl.DateTimeFormat("en-ZA", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      }).format(activity.createdAt)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Quote activity will appear after the first draft is created.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

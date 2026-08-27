@@ -26,7 +26,7 @@ QuoteKit is a multi-tenant SaaS quotation platform built with the Next.js App Ro
    npx auth secret
    ```
 
-`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
+`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `APP_URL` is server-only and must be the canonical HTTPS origin in production. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
 
 ## Prisma and database
 
@@ -93,6 +93,18 @@ Each organisation owns an atomic `nextQuoteNumber` counter. Draft creation valid
 
 Browser-submitted organisation IDs, quote numbers, statuses, and totals are ignored. Server Actions resolve the active organisation from the authenticated session, validate Customer and Catalog ownership again, run the canonical pricing engine, and persist only server-calculated totals. Non-DRAFT and cross-organisation updates are rejected server-side.
 
+## Quote delivery and public responses
+
+A DRAFT Quote with a Customer email address can be sent from its internal detail page. QuoteKit generates one cryptographically secure 256-bit base64url token and sends a simple transactional email through the Resend HTTP API. Public links use `/q/<token>` and contain no quote number, database ID, user ID, or organisation ID. Configure and verify the `EMAIL_FROM` sender in Resend before testing delivery.
+
+The public page is available without an account and renders persisted Quote/QuoteItem snapshots, the customer-visible message, and terms. It never selects or renders internal notes, membership data, or authentication data. First access records one VIEWED activity and timestamp; refreshes are idempotent. The internal link owner opening the link also counts as the first view for this MVP.
+
+Server-side transitions allow `DRAFT → SENT`, `SENT → VIEWED`, and `SENT/VIEWED → ACCEPTED` or `DECLINED`. ACCEPTED and DECLINED are terminal through the public interface and repeated same responses do not create duplicate activity. Expiry is derived at request time after the end of `expiryDate`: expired Quotes remain historically readable, acceptance is blocked, and no scheduler or automatic EXPIRED database update is used.
+
+Email is attempted before SENT is persisted. A provider/configuration failure returns an error and leaves the Quote DRAFT with no SENT timestamp or activity. The secure token may already have been allocated for a failed attempt, but DRAFT tokens do not resolve publicly; retrying reuses the same token. The internal detail page exposes copy/open controls after successful delivery.
+
+The dashboard conversion rate is `accepted / (accepted + declined)`. SENT and VIEWED Quotes are undecided and are not counted as failed conversions.
+
 ## Troubleshooting
 
 - **Incorrect host or origin:** set `AUTH_URL` when the deployment origin cannot be inferred. Ensure the reverse proxy rejects arbitrary Host headers and forwards only the canonical public host.
@@ -101,6 +113,8 @@ Browser-submitted organisation IDs, quote numbers, statuses, and totals are igno
 - **Prisma client import or generation error:** run `npx prisma generate` and confirm generated files exist under `generated/prisma/`.
 - **Missing table or migration:** run `npx prisma migrate status`, then `npx prisma migrate dev` locally or `npx prisma migrate deploy` in production.
 - **PostgreSQL connection failure:** check credentials, host access, provider TLS requirements, and whether the database accepts connections from the current environment.
+- **Quote email is not configured:** set `APP_URL`, `RESEND_API_KEY`, and `EMAIL_FROM`; use a sender/domain verified by Resend. Local `APP_URL` may use HTTP, while production requires HTTPS.
+- **Resend rejects a request:** confirm the API key is active, the sender is verified, and the Customer snapshot contains a valid deliverable email address. A failed request leaves the Quote DRAFT so it can be retried safely.
 - **bcrypt native module error:** use a supported Node.js version and reinstall dependencies for the current OS/architecture so the native package can rebuild.
 - **Redirect loop between onboarding and dashboard:** verify the session user still exists and has a Membership whose Organization is active.
 

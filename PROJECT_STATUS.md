@@ -2,76 +2,90 @@
 
 ## Current sprint
 
-Sprint 8B: Draft quote creation and persistence — complete on `feat/sprint-8b-draft-quotes`.
+Sprint 9: Quote delivery and customer interaction — complete on `feat/sprint-9-quote-delivery`.
 
-## Completed
+## Delivery workflow
 
-- Replaced the mock Quote list and detail routes with organisation-scoped PostgreSQL reads.
-- Added `/quotes/new` and `/quotes/[id]/edit` using the existing application design.
-- Added a reusable Quote builder for active Customer selection, active Catalog insertion, custom line items, fractional quantities, discounts, messages, notes, and terms.
-- Added structured create/update Server Actions with pending, field-error, and general-error states.
-- Added server-side draft creation and editing services.
-- Added real Quote totals/counts/recent records to the dashboard.
-- Removed the obsolete Quote mock dataset.
+- DRAFT Quotes with a Customer email address can be sent from the existing internal Quote detail page.
+- Sending generates or reuses one cryptographically secure public token, builds a trusted `/q/<token>` URL, attempts email delivery through Resend, then records SENT only after provider success.
+- Internal users can copy or open the public link after successful delivery.
+- The unauthenticated public page renders persisted Quote and QuoteItem snapshots, message, terms, totals, and response state.
+- Public Accept and Confirm decline actions identify the Quote only through the validated token.
+- Quote detail displays a real activity timeline; dashboard cards and recent activity now use delivery data.
 
-## Persistence and transaction strategy
+## Token and public-access security
 
-- Draft creation validates all input and tenant-owned references inside a serializable transaction.
-- The same transaction snapshots the Customer, calculates canonical totals, atomically reserves the organisation quote number, and creates the Quote with nested QuoteItems.
-- A failed create rolls back both records and the number counter.
-- Draft edits are organisation-scoped, verify DRAFT status server-side, recalculate all totals, and atomically replace the QuoteItems while preserving the quote number.
-- Shared serializable retry handling covers supported transient connection, serialization, write-conflict, and transaction-expiry errors.
-- The existing `(organizationId, quoteNumber)` and `(quoteId, position)` database constraints remain final collision/integrity safeguards.
+- Tokens contain 32 random bytes (256 bits) encoded as a 43-character base64url value using Node `crypto.randomBytes`.
+- `Quote.publicToken` is nullable, unique, and limited to 64 characters; each Quote keeps at most one token for the MVP.
+- Public URLs do not contain Quote IDs, quote numbers, organisation IDs, or user IDs.
+- DRAFT tokens do not resolve publicly, including tokens allocated before a failed email attempt.
+- Invalid/inactive tokens return the same safe not-found page.
+- The public query deliberately excludes internal notes, memberships, users, authentication information, and activity history.
+- Internal send/token/activity access remains constrained by Quote ID plus the session-derived active organisation ID.
 
-## Pricing and snapshots
+## Status, viewed, and response rules
 
-- The Sprint 8A Decimal pricing engine remains authoritative; browser totals, status, number, and organisation ID are not submitted as trusted values.
-- Money and calculated totals remain `Decimal(19,2)`, tax rates `Decimal(5,2)`, and quantities `Decimal(19,4)`.
-- Catalog insertion pre-fills an editable line, and the saved QuoteItem retains those quote-specific values even if Catalog later changes.
-- Custom lines persist with `catalogItemId = null` and do not create Catalog records.
-- Customer identity/contact/address data is snapshotted on the Quote.
-- Existing quote detail renders entirely from persisted snapshots and therefore survives later Customer/Catalog changes or archives.
-- An existing draft may retain its currently linked archived Customer or inactive CatalogItem during editing; new unavailable references remain blocked.
+- Explicit server transitions allow DRAFT → SENT and SENT → VIEWED.
+- SENT or VIEWED may become ACCEPTED or DECLINED.
+- ACCEPTED and DECLINED are terminal through public actions and cannot be reversed.
+- Repeated same responses are idempotent and do not duplicate activity.
+- First public access sets `firstViewedAt`, records one VIEWED activity, and upgrades SENT to VIEWED.
+- Refreshes do not create repeated VIEWED events; viewing ACCEPTED/DECLINED never downgrades status.
+- The business user opening the public link also counts as a view for this MVP.
 
-## Tenant and status security
+## Email behavior
 
-- Active organisation identity always comes from the authenticated server session.
-- Quote list/detail/edit reads include the trusted `organizationId`.
-- Customer and Catalog references are rechecked using ID plus active organisation during each mutation.
-- Another tenant's quote returns the same safe not-found behavior as a missing quote.
-- Cross-tenant updates throw a safe unavailable error.
-- Only DRAFT quotes are editable, enforced by the server service rather than UI visibility.
-- New quotes are always DRAFT; no delivery/status-transition workflow was added.
+- Resend is called through a small server-only HTTP adapter; no additional email package was necessary.
+- Email contains the business/customer names, Quote number, total, expiry date, and public link; it excludes internal notes and PDF attachments.
+- Required variables are `APP_URL`, `RESEND_API_KEY`, and `EMAIL_FROM`.
+- `APP_URL` must be a plain trusted HTTP/HTTPS origin and must use HTTPS in production.
+- Email is attempted before SENT persistence. Provider/configuration failure leaves the Quote DRAFT with no `sentAt` or SENT activity so it can be retried.
+- Tests inject a fake provider and never send real email.
+
+## Expiry and dashboard behavior
+
+- Expiry is derived after the end of the stored `expiryDate`; no scheduler or automatic EXPIRED persistence was added.
+- Expired Quotes remain readable but cannot be newly accepted. Decline remains available.
+- Dashboard awaiting-response count includes SENT and VIEWED.
+- Accepted value includes ACCEPTED Quotes only.
+- Conversion is `accepted / (accepted + declined)`; undecided Quotes are excluded.
 
 ## Database changes
 
-- No Sprint 8B schema change or migration was required.
-- Sprint 8B uses the Sprint 8A Quote, QuoteItem, enums, counters, Decimal fields, indexes, and constraints.
-- Migration status confirms all four repository migrations are applied.
+- Added `QuoteActivityType`: CREATED, UPDATED, SENT, VIEWED, ACCEPTED, DECLINED.
+- Added Quote `publicToken`, `sentAt`, `firstViewedAt`, `acceptedAt`, and `declinedAt`.
+- Added QuoteActivity with Quote cascade relation and `(quoteId, createdAt)` index.
+- Added a unique index for public tokens.
+- Draft creation/update now record CREATED/UPDATED activity in their existing transactions.
+- Migration `20260825162206_quote_delivery` was reviewed and applied successfully without resetting existing data.
 
 ## Validation
 
+- Prisma format: passed.
 - Prisma validate: passed.
 - Prisma Client generation: passed.
-- Prisma migration status: database schema is up to date (4 migrations).
-- TypeScript validation: passed.
+- Prisma migration status: database up to date with all 5 migrations.
+- TypeScript: passed.
 - ESLint: passed with no warnings.
-- Unit tests: 30 passed.
-- PostgreSQL integration tests: 26 passed, including 7 new Quote persistence/edit/security tests.
-- Production build: passed.
-- Production start: healthy; `/` and `/login` returned 200.
-- Logged-out production route smoke: `/quotes`, `/quotes/new`, Quote detail, and Quote edit redirected to `/login`.
-- Automated browser click-through: not run because no controllable browser was attached; authenticated persistence behavior is covered by PostgreSQL integration tests.
+- Unit tests: 36 passed, including 6 new delivery/token/transition tests.
+- Full PostgreSQL integration suite: 34 passed, including 8 new delivery tests.
+- Focused post-hardening delivery integration rerun: 8 passed.
+- Production build: passed and includes `/q/[token]`.
+- Production smoke: `/` and `/login` returned 200; `/quotes` redirected to `/login`; invalid public token returned 404.
+- `git diff --check`: passed.
+- Browser automation was unavailable because no controllable browser was attached.
 
 ## Remaining limitations
 
-- Client-side totals are not previewed while editing; the server-calculated result is shown after save.
-- Search returns a sensible capped result set rather than cursor pagination.
-- There is no idempotency token for two independent direct create requests; the pending UI prevents accidental double-clicks and transactional numbering prevents corruption.
-- Only ZAR is supported by current validation.
-- Email delivery, public quote links, VIEWED tracking, accept/decline, activity history, PDF generation, payments, invoices, and permanent deletion remain intentionally unimplemented.
-- Full authenticated browser walkthrough should be repeated manually in a signed-in local browser.
+- A real Resend message was not sent during automated validation; a verified sender/domain and production API key must be tested manually.
+- Email and database status cannot form one distributed transaction. If email succeeds but the subsequent database transaction fails, the user must retry; SENT is never falsely recorded before provider success.
+- Concurrent independent send requests may result in duplicate provider emails, although status transitions and the pending UI prevent invalid database state changes.
+- Public link rotation/revocation, business-view exclusion, decline reasons, automatic expiry jobs, PDFs, invoices, payments, e-signatures, customer portals, and advanced approvals are not implemented.
+
+## Vercel readiness
+
+The application code, schema, migration, tests, and production build are ready for Vercel deployment after `APP_URL`, `RESEND_API_KEY`, `EMAIL_FROM`, existing auth/database variables, and a verified Resend sender are configured. Run `npx prisma migrate deploy` during deployment and complete one real staging email/public Accept/Decline walkthrough before production release.
 
 ## Next recommended sprint
 
-Quote delivery and customer interaction: secure public quote URLs, email delivery, SENT/VIEWED transitions, accept/decline, and activity history. PDF generation may follow once the delivery workflow is stable.
+PDF generation and branded Quote documents, followed by invoice conversion only after the delivery workflow has been verified in staging.
