@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -5,6 +6,12 @@ import { OnboardingForm } from "@/components/onboarding/onboarding-form";
 import { Logo } from "@/components/shared/logo";
 import { requireUser } from "@/lib/auth/access";
 import { getActiveOrganizationMembership } from "@/lib/auth/organization";
+import { NO_INDEX_ROBOTS } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Set up your business",
+  robots: NO_INDEX_ROBOTS,
+};
 
 export default async function OnboardingPage() {
   const user = await requireUser({ callbackUrl: "/onboarding" });

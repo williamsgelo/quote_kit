@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { getAuthenticatedAppPath } from "@/lib/auth/access";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
+
+export const metadata: Metadata = {
+  title: "Log in",
+};
 
 export default async function LoginPage({
   searchParams,

@@ -1,46 +1,188 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  BriefcaseBusiness,
+  Building2,
   Check,
   CheckCircle2,
-  Clock3,
   FileText,
+  Hammer,
   LayoutDashboard,
   Send,
   Sparkles,
   Users,
+  Wrench,
 } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  HOMEPAGE_DESCRIPTION,
+  HOMEPAGE_TITLE,
+  SITE_NAME,
+  SITE_ORIGIN,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: { absolute: HOMEPAGE_TITLE },
+  description: HOMEPAGE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    url: "/",
+    siteName: SITE_NAME,
+    title: HOMEPAGE_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "QuoteKit online quotation software",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOMEPAGE_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    images: ["/opengraph-image"],
+  },
+};
 
 const features = [
   {
     icon: FileText,
-    title: "Polished quotes, quickly",
+    title: "Build accurate quotations",
     description:
-      "Turn reusable products and services into clear, professional quotes in minutes.",
+      "Add reusable services, quantities, prices, discounts, and tax to a clear customer quote.",
   },
   {
-    icon: Users,
-    title: "Customers stay organised",
+    icon: Send,
+    title: "Send a secure online quote",
     description:
-      "Keep contact details, quote history, and the next step together in one workspace.",
+      "Email a customer-ready link instead of managing changing Word documents and PDF attachments.",
   },
   {
     icon: LayoutDashboard,
-    title: "Know what’s moving",
+    title: "Track every quote status",
     description:
-      "See when quotes are sent, viewed, accepted, or need your attention at a glance.",
+      "See when a quote is sent, viewed, accepted, declined, or past its validity date.",
   },
 ];
+
+const workflow = [
+  {
+    icon: Users,
+    step: "01",
+    title: "1. Add your customer",
+    text: "Keep the contact and billing details needed for a professional quotation together.",
+  },
+  {
+    icon: FileText,
+    step: "02",
+    title: "2. Create the quote",
+    text: "Choose services, set quantities and prices, then calculate discount and tax consistently.",
+  },
+  {
+    icon: Send,
+    step: "03",
+    title: "3. Send it online",
+    text: "Share a secure customer link by email without attaching another version of the document.",
+  },
+  {
+    icon: CheckCircle2,
+    step: "04",
+    title: "4. Get a decision",
+    text: "The customer can view, accept, or decline while you follow the quote status from QuoteKit.",
+  },
+];
+
+const businessTypes = [
+  {
+    icon: BriefcaseBusiness,
+    title: "Freelancers and consultants",
+    text: "Turn a discussed scope into a clear quotation while the opportunity is still warm.",
+  },
+  {
+    icon: Building2,
+    title: "Agencies and studios",
+    text: "Quote repeatable services while keeping customer-specific scope and pricing visible.",
+  },
+  {
+    icon: Hammer,
+    title: "Trades and contractors",
+    text: "Present labour, materials, quantities, tax, and the final amount in one online quote.",
+  },
+  {
+    icon: Wrench,
+    title: "Cleaning and maintenance teams",
+    text: "Build consistent service quotes from a reusable catalog and track each customer response.",
+  },
+];
+
+const questions = [
+  {
+    question: "What is an online quote tool?",
+    answer:
+      "An online quote tool helps a business prepare pricing, send a quotation through a secure link, and track the customer's response from one workspace.",
+  },
+  {
+    question: "What happens after I send a quote?",
+    answer:
+      "QuoteKit emails the customer a secure link. You can see when the quote is viewed, and the customer can accept or decline it online.",
+  },
+  {
+    question: "Can I include tax and discounts?",
+    answer:
+      "Yes. QuoteKit calculates line totals, quote-level discounts, tax, and the final amount using decimal-safe server-side calculations.",
+  },
+  {
+    question: "Is QuoteKit suitable for South African businesses?",
+    answer:
+      "Yes. The current product supports South African rand pricing and is designed for small service businesses that need a practical quotation workflow.",
+  },
+];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_ORIGIN}/#website`,
+      url: `${SITE_ORIGIN}/`,
+      name: SITE_NAME,
+      description: HOMEPAGE_DESCRIPTION,
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_ORIGIN}/#software`,
+      name: SITE_NAME,
+      url: `${SITE_ORIGIN}/`,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description: HOMEPAGE_DESCRIPTION,
+    },
+  ],
+};
 
 export default function HomePage() {
   return (
     <div className="min-h-dvh bg-[#fbfbfc]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <header className="sticky top-0 z-40 border-b bg-[#fbfbfc]/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
@@ -54,8 +196,11 @@ export default function HomePage() {
             <a href="#how-it-works" className="hover:text-foreground">
               How it works
             </a>
-            <a href="#pricing" className="hover:text-foreground">
-              Pricing
+            <a href="#for-businesses" className="hover:text-foreground">
+              Who it is for
+            </a>
+            <a href="#questions" className="hover:text-foreground">
+              Questions
             </a>
           </nav>
           <div className="flex items-center gap-2">
@@ -72,7 +217,7 @@ export default function HomePage() {
               href="/signup"
               className={cn(buttonVariants({ size: "lg" }), "px-3")}
             >
-              Start free
+              Create an account
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
@@ -88,14 +233,17 @@ export default function HomePage() {
                   className="size-3.5 text-blue-600"
                   aria-hidden="true"
                 />
-                Simple quoting for growing teams
+                Online quoting software for service businesses
               </div>
               <h1 className="mt-6 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-[-0.035em] text-balance sm:text-5xl lg:text-6xl">
-                Turn good conversations into accepted work.
+                Create Professional Quotes Online in Minutes
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-                QuoteKit helps service businesses create polished quotes, follow
-                every opportunity, and give customers an easy path to yes.
+                QuoteKit helps small service businesses create accurate customer
+                quotations, send them through a secure online link, and track
+                every view, acceptance, or decline. Keep pricing, tax, discounts,
+                and quote status together instead of chasing Word files and PDF
+                attachments.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -109,33 +257,38 @@ export default function HomePage() {
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
                     "h-11 px-5 text-sm",
                   )}
                 >
-                  Log in to your workspace
+                  Log in to QuoteKit
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
-                {["No credit card", "Set up in minutes", "Cancel anytime"].map(
-                  (item) => (
-                    <span key={item} className="flex items-center gap-1.5">
-                      <Check
-                        className="size-3.5 text-emerald-600"
-                        aria-hidden="true"
-                      />
-                      {item}
-                    </span>
-                  ),
-                )}
+                {[
+                  "Reusable service catalog",
+                  "Secure customer links",
+                  "Quote status tracking",
+                ].map((item) => (
+                  <span key={item} className="flex items-center gap-1.5">
+                    <Check
+                      className="size-3.5 text-emerald-600"
+                      aria-hidden="true"
+                    />
+                    {item}
+                  </span>
+                ))}
               </div>
             </div>
 
             <div className="relative lg:pl-6">
               <div className="absolute -inset-8 -z-10 rounded-full bg-blue-100/50 blur-3xl" />
-              <Card className="overflow-hidden border-slate-200 shadow-xl shadow-slate-900/8">
+              <Card
+                className="overflow-hidden border-slate-200 shadow-xl shadow-slate-900/8"
+                aria-label="Example customer quote"
+              >
                 <div className="flex items-center justify-between border-b bg-slate-950 px-5 py-4 text-white">
                   <div>
                     <p className="text-xs text-slate-400">QUOTE</p>
@@ -160,7 +313,7 @@ export default function HomePage() {
                       <p className="text-xs text-muted-foreground">Prepared for</p>
                       <p className="mt-1 text-sm font-medium">Hart & Finch</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Expires 11 Aug 2026
+                        Expires 30 Sep 2026
                       </p>
                     </div>
                   </div>
@@ -175,12 +328,12 @@ export default function HomePage() {
                         className="flex items-center justify-between gap-4 text-sm"
                       >
                         <span className="text-muted-foreground">{name}</span>
-                        <span className="font-medium">{price}</span>
+                        <span className="font-medium tabular-nums">{price}</span>
                       </div>
                     ))}
                     <div className="flex items-end justify-between border-t pt-4">
                       <span className="text-sm font-medium">Total incl. VAT</span>
-                      <span className="text-2xl font-semibold tracking-tight">
+                      <span className="text-2xl font-semibold tracking-tight tabular-nums">
                         R 51,635
                       </span>
                     </div>
@@ -194,7 +347,7 @@ export default function HomePage() {
                 <div>
                   <p className="text-xs font-medium">Quote viewed</p>
                   <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Amelia opened it 2m ago
+                    Customer opened it 2m ago
                   </p>
                 </div>
               </div>
@@ -204,16 +357,19 @@ export default function HomePage() {
 
         <section
           id="features"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8"
+          className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6 lg:px-8"
         >
           <div className="max-w-2xl">
-            <p className="text-sm font-medium text-primary">Everything in reach</p>
+            <p className="text-sm font-medium text-primary">
+              One practical quotation workflow
+            </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-balance">
-              Less admin between the work you win and the work you do.
+              Create and send quotes faster
             </h2>
             <p className="mt-4 leading-7 text-muted-foreground">
-              A focused workspace for the moments that matter before a project
-              begins.
+              Move from customer details to a clear online quotation without
+              rebuilding documents, copying totals, or wondering which version
+              was sent.
             </p>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -236,94 +392,140 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="border-y bg-slate-950 text-white">
+        <section
+          id="how-it-works"
+          className="scroll-mt-20 border-y bg-slate-950 text-white"
+        >
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-              <div>
-                <p className="text-sm font-medium text-blue-400">
-                  A clearer workflow
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-                  From first draft to accepted.
-                </h2>
-                <p className="mt-4 max-w-md text-sm leading-6 text-slate-400">
-                  QuoteKit keeps each step visible, so you always know what to do
-                  next.
-                </p>
-              </div>
-              <ol className="grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-3">
-                {[
-                  {
-                    icon: FileText,
-                    step: "01",
-                    title: "Build",
-                    text: "Choose a customer, add your items, and tailor the scope.",
-                  },
-                  {
-                    icon: Send,
-                    step: "02",
-                    title: "Send",
-                    text: "Share a polished customer-ready quote in a few clicks.",
-                  },
-                  {
-                    icon: Clock3,
-                    step: "03",
-                    title: "Follow",
-                    text: "See activity and keep the right opportunity moving.",
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={item.step} className="bg-slate-950 p-6">
-                      <div className="flex items-center justify-between">
-                        <Icon
-                          className="size-5 text-blue-400"
-                          aria-hidden="true"
-                        />
-                        <span className="font-mono text-xs text-slate-600">
-                          {item.step}
-                        </span>
-                      </div>
-                      <h3 className="mt-8 font-semibold">{item.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-400">
-                        {item.text}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ol>
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-blue-400">
+                A clearer workflow
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+                How QuoteKit works
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-slate-400">
+                Keep each step visible from the first customer conversation to a
+                recorded decision.
+              </p>
             </div>
+            <ol className="mt-10 grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+              {workflow.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.step} className="bg-slate-950 p-6">
+                    <div className="flex items-center justify-between">
+                      <Icon
+                        className="size-5 text-blue-400"
+                        aria-hidden="true"
+                      />
+                      <span className="font-mono text-xs text-slate-600">
+                        {item.step}
+                      </span>
+                    </div>
+                    <h3 className="mt-8 font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-400">
+                      {item.text}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </section>
 
         <section
-          id="pricing"
-          className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8"
+          id="for-businesses"
+          className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 sm:px-6 lg:px-8"
         >
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-primary">
+              Designed around service work
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+              Built for small service businesses
+            </h2>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              QuoteKit is focused quoting software for businesses that sell
+              expertise, labour, projects, and recurring services rather than
+              complex inventory.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {businessTypes.map((business) => {
+              const Icon = business.icon;
+              return (
+                <Card key={business.title} className="bg-background">
+                  <CardContent className="p-6">
+                    <Icon className="size-5 text-blue-700" aria-hidden="true" />
+                    <h3 className="mt-5 font-semibold">{business.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {business.text}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
+        <section id="questions" className="scroll-mt-20 border-y bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-primary">
+                Common questions
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+                Online quotation software questions
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+              {questions.map((item) => (
+                <div key={item.question}>
+                  <h3 className="font-semibold">{item.question}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {item.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-sm font-medium text-primary">Start simply</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-            Make your next quote your best one.
+            Create your next professional quote with QuoteKit
           </h2>
           <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
-            Create a workspace and build your first customer quote in minutes.
+            Set up a workspace, add a customer, and build a quotation with clear
+            pricing and an online path to a decision.
           </p>
           <Link
             href="/signup"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "mt-7 h-11 px-5",
-            )}
+            className={cn(buttonVariants({ size: "lg" }), "mt-7 h-11 px-5")}
           >
-            Start free
+            Create an account
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </section>
       </main>
 
       <footer className="border-t">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <Logo />
-          <p>© 2026 QuoteKit. Built for better business.</p>
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div>
+            <Logo />
+            <p className="mt-2">Online quotation software for service businesses.</p>
+          </div>
+          <nav aria-label="Footer navigation" className="flex flex-wrap gap-5">
+            <Link href="/login" className="hover:text-foreground">
+              Log in
+            </Link>
+            <Link href="/signup" className="hover:text-foreground">
+              Create an account
+            </Link>
+          </nav>
+          <p>© 2026 QuoteKit · quotevia.co.za</p>
         </div>
       </footer>
     </div>

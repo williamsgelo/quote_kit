@@ -26,7 +26,7 @@ QuoteKit is a multi-tenant SaaS quotation platform built with the Next.js App Ro
    npx auth secret
    ```
 
-`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `SUPPORT_EMAIL` optionally configures the mailto contact shown on the Help & Support page. `APP_URL` is server-only and must be the canonical HTTPS origin in production. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
+`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `SUPPORT_EMAIL` optionally configures the mailto contact shown on the Help & Support page. `APP_URL` is server-only and supplies both secure Quote links and the canonical SEO origin; production must set it to `https://quotevia.co.za`. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
 
 ## Prisma and database
 
@@ -68,6 +68,12 @@ Open [http://localhost:3000](http://localhost:3000). Integration tests require a
 6. Log back in and confirm the existing membership sends the user directly to the dashboard.
 
 The shared server application layout protects `/dashboard`, `/customers`, `/catalog`, `/quotes`, `/settings`, and `/help`. Active organisation selection uses the authenticated user's first active membership ordered by membership creation time and ID. Browser-provided user IDs, roles, and organisation IDs are never trusted.
+
+## Launch SEO
+
+The homepage is the only route included in `sitemap.xml`. It has a self-referencing canonical on `https://quotevia.co.za/`, index/follow metadata, Open Graph and Twitter metadata, and accurate WebSite and SoftwareApplication JSON-LD. `robots.txt` references the sitemap and keeps API and authenticated application paths out of crawl queues. API and secure Quote responses also receive `X-Robots-Tag: noindex, nofollow`, and requests reaching the app on `www.quotevia.co.za` permanently redirect to the canonical non-www origin.
+
+Authentication, onboarding, authenticated application layouts, and `/q/[token]` use page or shared-layout `noindex, nofollow` metadata. Secure customer Quote URLs are never added to the sitemap. The authenticated `/help` page is intentionally noindex until a separate public help resource exists.
 
 ## Customer management
 

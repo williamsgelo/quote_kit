@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { CheckCircle2, FileCheck2, Sparkles } from "lucide-react";
 
 import { Logo } from "@/components/shared/logo";
+import { NO_INDEX_ROBOTS } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  robots: NO_INDEX_ROBOTS,
+};
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (

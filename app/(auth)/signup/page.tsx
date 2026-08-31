@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignupForm } from "@/components/auth/signup-form";
 import { getAuthenticatedAppPath } from "@/lib/auth/access";
+
+export const metadata: Metadata = {
+  title: "Create an account",
+};
 
 export default async function SignupPage() {
   const authenticatedAppPath = await getAuthenticatedAppPath();

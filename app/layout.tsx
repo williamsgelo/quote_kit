@@ -1,13 +1,59 @@
 import type { Metadata } from "next";
+
+import {
+  HOMEPAGE_DESCRIPTION,
+  HOMEPAGE_TITLE,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: SITE_URL,
   title: {
-    default: "QuoteKit — Quotes that move business forward",
+    default: HOMEPAGE_TITLE,
     template: "%s | QuoteKit",
   },
-  description:
-    "Create polished quotes, keep customers moving, and track every opportunity in one simple workspace.",
+  description: HOMEPAGE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    siteName: SITE_NAME,
+    title: HOMEPAGE_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "QuoteKit online quotation software",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOMEPAGE_TITLE,
+    description: HOMEPAGE_DESCRIPTION,
+    images: ["/opengraph-image"],
+  },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en-ZA" className="h-full antialiased">
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
