@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
 import {
+  GoogleTagManagerHead,
+  GoogleTagManagerNoScript,
+} from "@/components/analytics/google-tag-manager";
+import {
   HOMEPAGE_DESCRIPTION,
   HOMEPAGE_TITLE,
   SITE_NAME,
@@ -63,7 +67,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-ZA" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        <GoogleTagManagerHead />
+      </head>
+      <body className="flex min-h-full flex-col">
+        <GoogleTagManagerNoScript />
+        {children}
+      </body>
     </html>
   );
 }

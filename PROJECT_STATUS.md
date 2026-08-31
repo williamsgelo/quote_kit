@@ -47,6 +47,7 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 - FAQ structured data was intentionally omitted; the FAQ remains visible content, but QuoteKit is not eligible for Google's limited FAQ rich-result treatment.
 - Replaced the placeholder favicon with a branded SVG icon and added a generated Apple touch icon.
 - Added a 1200×630 branded Open Graph image reused for Twitter cards.
+- Installed Google Tag Manager container `GTM-NNNSRZSB` in the root layout without adding a third-party analytics package; the bootstrap runs in the head and the fallback iframe renders immediately after the opening body tag.
 
 ## Architecture and database
 

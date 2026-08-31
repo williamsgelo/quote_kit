@@ -75,6 +75,8 @@ The homepage is the only route included in `sitemap.xml`. It has a self-referenc
 
 Authentication, onboarding, authenticated application layouts, and `/q/[token]` use page or shared-layout `noindex, nofollow` metadata. Secure customer Quote URLs are never added to the sitemap. The authenticated `/help` page is intentionally noindex until a separate public help resource exists.
 
+Google Tag Manager container `GTM-NNNSRZSB` is installed directly in the root layout without an analytics dependency. The bootstrap script is rendered in the document head and the required noscript iframe is the first element inside the body, so the container is available across marketing, authentication, application, and public Quote routes.
+
 ## Customer management
 
 Customers are persisted in PostgreSQL and always belong to one organisation. The `/customers` routes support active-customer listing, server-side search, create, detail, edit, and soft archive. Archived records are excluded from the normal list but retained for future historical quote relationships.
