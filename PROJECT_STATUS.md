@@ -2,90 +2,65 @@
 
 ## Current sprint
 
-Sprint 9: Quote delivery and customer interaction — complete on `feat/sprint-9-quote-delivery`.
+Sprint 10: MVP polish — implementation complete, with manual browser and remote-database regression follow-up noted below.
 
-## Delivery workflow
+## MVP polish delivered
 
-- DRAFT Quotes with a Customer email address can be sent from the existing internal Quote detail page.
-- Sending generates or reuses one cryptographically secure public token, builds a trusted `/q/<token>` URL, attempts email delivery through Resend, then records SENT only after provider success.
-- Internal users can copy or open the public link after successful delivery.
-- The unauthenticated public page renders persisted Quote and QuoteItem snapshots, message, terms, totals, and response state.
-- Public Accept and Confirm decline actions identify the Quote only through the validated token.
-- Quote detail displays a real activity timeline; dashboard cards and recent activity now use delivery data.
+- Added the authenticated `/help` route with getting-started steps, Quote status definitions, common questions, expiry guidance, and a configurable support mailto action.
+- Connected both Help & Support entry points in the sidebar and user menu to `/help`.
+- Removed the placeholder notification control, incorrect Catalog guide link, disabled Customer/Catalog filter buttons, and out-of-scope Quote PDF/duplicate actions.
+- Replaced placeholder Settings inputs, fake workspace identifiers, fake plan data, and non-functional branding upload with accurate read-only organisation, account, and current Quote-default information.
+- Simplified onboarding to collect only the organisation name that is actually persisted.
+- Clarified marketing, login, dashboard, and Quote-list copy so the UI no longer promises demo data, e-signatures, password reset, or draft-only behavior that is not implemented.
+- Customer lists now show real organisation-scoped Quote counts, and Customer detail shows the five most recent related Quotes instead of a hardcoded empty state.
+- Sent or viewed Quotes past their expiry date display a derived Expired state internally; expired Quotes are excluded from the dashboard's awaiting-response count without changing persisted statuses.
+- Quote delivery controls now handle clipboard failure and provide explicit copy/send feedback.
+- Public Accept and Decline actions now clearly identify terminal responses, confirm before submission, and retain disabled/loading/error/success states.
+- Quote line items render as mobile cards on narrow screens while retaining the existing desktop table.
+- Mobile navigation now locks background scrolling, receives initial focus, closes with Escape, and exposes dialog semantics.
+- Long customer, organisation, email, item, and monetary values have improved wrapping or tabular alignment in key surfaces.
+- The transactional Quote email now has a clearer subject, recognisable business header, labelled total/expiry information, a focused View quote CTA, and an improved plain-text fallback.
 
-## Token and public-access security
+## Help and support configuration
 
-- Tokens contain 32 random bytes (256 bits) encoded as a 43-character base64url value using Node `crypto.randomBytes`.
-- `Quote.publicToken` is nullable, unique, and limited to 64 characters; each Quote keeps at most one token for the MVP.
-- Public URLs do not contain Quote IDs, quote numbers, organisation IDs, or user IDs.
-- DRAFT tokens do not resolve publicly, including tokens allocated before a failed email attempt.
-- Invalid/inactive tokens return the same safe not-found page.
-- The public query deliberately excludes internal notes, memberships, users, authentication information, and activity history.
-- Internal send/token/activity access remains constrained by Quote ID plus the session-derived active organisation ID.
+- `SUPPORT_EMAIL` optionally controls the contact address shown on `/help`.
+- When omitted, the server-only support configuration falls back to the generic QuoteKit support address.
+- No support database, ticket system, live chat, CMS, or chatbot was added.
 
-## Status, viewed, and response rules
+## Architecture and security
 
-- Explicit server transitions allow DRAFT → SENT and SENT → VIEWED.
-- SENT or VIEWED may become ACCEPTED or DECLINED.
-- ACCEPTED and DECLINED are terminal through public actions and cannot be reversed.
-- Repeated same responses are idempotent and do not duplicate activity.
-- First public access sets `firstViewedAt`, records one VIEWED activity, and upgrades SENT to VIEWED.
-- Refreshes do not create repeated VIEWED events; viewing ACCEPTED/DECLINED never downgrades status.
-- The business user opening the public link also counts as a view for this MVP.
-
-## Email behavior
-
-- Resend is called through a small server-only HTTP adapter; no additional email package was necessary.
-- Email contains the business/customer names, Quote number, total, expiry date, and public link; it excludes internal notes and PDF attachments.
-- Required variables are `APP_URL`, `RESEND_API_KEY`, and `EMAIL_FROM`.
-- `APP_URL` must be a plain trusted HTTP/HTTPS origin and must use HTTPS in production.
-- Email is attempted before SENT persistence. Provider/configuration failure leaves the Quote DRAFT with no `sentAt` or SENT activity so it can be retried.
-- Tests inject a fake provider and never send real email.
-
-## Expiry and dashboard behavior
-
-- Expiry is derived after the end of the stored `expiryDate`; no scheduler or automatic EXPIRED persistence was added.
-- Expired Quotes remain readable but cannot be newly accepted. Decline remains available.
-- Dashboard awaiting-response count includes SENT and VIEWED.
-- Accepted value includes ACCEPTED Quotes only.
-- Conversion is `accepted / (accepted + declined)`; undecided Quotes are excluded.
-
-## Database changes
-
-- Added `QuoteActivityType`: CREATED, UPDATED, SENT, VIEWED, ACCEPTED, DECLINED.
-- Added Quote `publicToken`, `sentAt`, `firstViewedAt`, `acceptedAt`, and `declinedAt`.
-- Added QuoteActivity with Quote cascade relation and `(quoteId, createdAt)` index.
-- Added a unique index for public tokens.
-- Draft creation/update now record CREATED/UPDATED activity in their existing transactions.
-- Migration `20260825162206_quote_delivery` was reviewed and applied successfully without resetting existing data.
+- No Prisma schema or migration changes were required.
+- Existing Server Components, Server Actions, Auth.js session enforcement, Resend adapter, Decimal pricing engine, and public token architecture remain unchanged.
+- Customer Quote counts/history are resolved under an organisation-scoped Customer query.
+- Public Quotes remain accessible only through validated public tokens and continue to exclude internal notes.
+- Quote financial calculations and persisted status transitions were not changed.
 
 ## Validation
 
-- Prisma format: passed.
 - Prisma validate: passed.
-- Prisma Client generation: passed.
-- Prisma migration status: database up to date with all 5 migrations.
+- Prisma Client generation: passed with Prisma 7.9.1.
 - TypeScript: passed.
 - ESLint: passed with no warnings.
-- Unit tests: 36 passed, including 6 new delivery/token/transition tests.
-- Full PostgreSQL integration suite: 34 passed, including 8 new delivery tests.
-- Focused post-hardening delivery integration rerun: 8 passed.
-- Production build: passed and includes `/q/[token]`.
-- Production smoke: `/` and `/login` returned 200; `/quotes` redirected to `/login`; invalid public token returned 404.
-- `git diff --check`: passed.
-- Browser automation was unavailable because no controllable browser was attached.
+- Unit tests: 36 passed.
+- Integration tests: sandboxed runs could not reach the configured remote PostgreSQL host and returned Prisma `P1001`; an approved network run remained unresponsive and was stopped. No integration assertion result is claimed.
+- Production build: passed and includes `/help` and `/q/[token]`.
+- HTTP smoke: `/`, `/login`, and `/signup` returned 200; `/help` and `/dashboard` redirected without authentication; an invalid public token returned 404.
+- Browser visual automation: unavailable because no controllable in-app browser was attached to this session.
 
-## Remaining limitations
+## Manual pilot checks still required
 
-- A real Resend message was not sent during automated validation; a verified sender/domain and production API key must be tested manually.
-- Email and database status cannot form one distributed transaction. If email succeeds but the subsequent database transaction fails, the user must retry; SENT is never falsely recorded before provider success.
-- Concurrent independent send requests may result in duplicate provider emails, although status transitions and the pending UI prevent invalid database state changes.
-- Public link rotation/revocation, business-view exclusion, decline reasons, automatic expiry jobs, PDFs, invoices, payments, e-signatures, customer portals, and advanced approvals are not implemented.
+- Review Landing, Login, Signup, Onboarding, Dashboard, Customers, Catalog, Quotes, Quote detail/builder, Settings, Help, and the public Quote at representative desktop and mobile widths.
+- Complete one authenticated create/edit/archive walkthrough for Customers and Catalog.
+- Complete one Draft → Edit → Send → Public View → Accept flow and a separate Decline flow against a staging database.
+- Confirm the public Quote never exposes internal notes and the activity timeline records one VIEWED event.
+- Send one staging email using a verified Resend sender and confirm sender identity, total, expiry, CTA, and plain-text fallback.
+- Configure and verify the production `SUPPORT_EMAIL` contact before inviting pilot users.
 
-## Vercel readiness
+## Deliberately deferred until after MVP
 
-The application code, schema, migration, tests, and production build are ready for Vercel deployment after `APP_URL`, `RESEND_API_KEY`, `EMAIL_FROM`, existing auth/database variables, and a verified Resend sender are configured. Run `npx prisma migrate deploy` during deployment and complete one real staging email/public Accept/Decline walkthrough before production release.
+- PDFs, invoicing, payments, Stripe, AI, e-signatures, inventory, accounting/CRM integrations, team permission expansion, organisation switching, ticketing, live chat, and a knowledge-base CMS.
+- Account profile editing, password reset, workspace branding/profile editing, public-link rotation, automated email resend, decline reasons, and automatic expiry jobs.
 
-## Next recommended sprint
+## Recommended next step
 
-PDF generation and branded Quote documents, followed by invoice conversion only after the delivery workflow has been verified in staging.
+Run the manual desktop/mobile and staging email/database checklist above with the first private-pilot organisation, then address only issues observed in that pilot before starting a post-MVP feature sprint.

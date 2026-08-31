@@ -118,13 +118,13 @@ export function UserMenu({
           <Settings className="size-3.5" aria-hidden="true" />
           Account settings
         </Link>
-        <button
-          type="button"
+        <Link
+          href="/help"
           className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <CircleHelp className="size-3.5" aria-hidden="true" />
           Help & support
-        </button>
+        </Link>
         <form action={logoutAction}>
           <LogoutButton />
         </form>

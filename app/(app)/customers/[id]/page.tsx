@@ -12,6 +12,7 @@ import {
 
 import { ArchiveCustomerButton } from "@/components/customers/archive-customer-button";
 import { EmptyState } from "@/components/shared/empty-state";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -23,7 +24,11 @@ import {
 } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/access";
 import { getCustomerForOrganization } from "@/lib/customers/queries";
+import { formatCurrency } from "@/lib/money";
+import { formatQuoteNumber } from "@/lib/quotes/numbering";
+import { isQuoteExpired } from "@/lib/quotes/transitions";
 import { cn } from "@/lib/utils";
+import { QuoteStatus } from "@/generated/prisma/client";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("en-ZA", {
@@ -40,6 +45,13 @@ function initials(name: string) {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
+}
+
+function quoteDisplayStatus(status: QuoteStatus, expiryDate: Date) {
+  return (status === QuoteStatus.SENT || status === QuoteStatus.VIEWED) &&
+    isQuoteExpired(expiryDate)
+    ? QuoteStatus.EXPIRED
+    : status;
 }
 
 export default async function CustomerDetailPage({
@@ -129,7 +141,7 @@ export default async function CustomerDetailPage({
                 {customer.email ? (
                   <a
                     href={`mailto:${customer.email}`}
-                    className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+                    className="mt-1 inline-flex max-w-full items-center gap-1.5 break-all text-sm font-medium hover:underline"
                   >
                     <Mail className="size-3.5" aria-hidden="true" />
                     {customer.email}
@@ -206,7 +218,7 @@ export default async function CustomerDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+              <p className="whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
                 {customer.notes || "No notes have been added."}
               </p>
             </CardContent>
@@ -219,13 +231,47 @@ export default async function CustomerDetailPage({
                 Quotes associated with this customer will appear here.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <EmptyState
-                icon={ReceiptText}
-                title="No database quotes yet"
-                description="Quotes created for this customer will appear in the Quotes workspace."
-              />
-            </CardContent>
+            {customer.quotes.length ? (
+              <CardContent className="divide-y p-0">
+                {customer.quotes.map((quote) => (
+                  <Link
+                    key={quote.id}
+                    href={`/quotes/${quote.id}`}
+                    className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium">
+                        {formatQuoteNumber(quote.quoteNumber)}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Issued {formatDate(quote.issueDate)}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 sm:justify-end">
+                      <StatusBadge
+                        status={quoteDisplayStatus(
+                          quote.status,
+                          quote.expiryDate,
+                        )}
+                      />
+                      <span className="font-medium tabular-nums">
+                        {formatCurrency(quote.total.toFixed(2), {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </CardContent>
+            ) : (
+              <CardContent>
+                <EmptyState
+                  icon={ReceiptText}
+                  title="No quotes yet"
+                  description="Quotes created for this customer will appear here."
+                />
+              </CardContent>
+            )}
           </Card>
         </div>
 

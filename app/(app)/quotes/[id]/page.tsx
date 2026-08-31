@@ -1,19 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Copy, Download, Edit3, MapPin } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Edit3, MapPin } from "lucide-react";
 
 import { QuoteStatus } from "@/generated/prisma/client";
 import { QuoteDeliveryActions } from "@/components/quotes/quote-delivery-actions";
 import { QuoteLineItems } from "@/components/quotes/quote-line-items";
 import { QuoteSummary } from "@/components/quotes/quote-summary";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { requireOrganization } from "@/lib/auth/access";
 import { quoteActivityLabel } from "@/lib/quotes/activity";
 import { buildPublicQuoteUrl } from "@/lib/quotes/delivery-service";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
 import { getQuoteForOrganization } from "@/lib/quotes/queries";
+import { isQuoteExpired } from "@/lib/quotes/transitions";
 import { cn } from "@/lib/utils";
 
 function formatDate(date: Date) {
@@ -46,6 +47,10 @@ export default async function QuoteDetailPage({
   }
 
   const number = formatQuoteNumber(quote.quoteNumber);
+  const expired =
+    (quote.status === QuoteStatus.SENT || quote.status === QuoteStatus.VIEWED) &&
+    isQuoteExpired(quote.expiryDate);
+  const displayStatus = expired ? QuoteStatus.EXPIRED : quote.status;
   let publicUrl: string | null = null;
   if (quote.publicToken && quote.status !== QuoteStatus.DRAFT) {
     try {
@@ -79,35 +84,13 @@ export default async function QuoteDetailPage({
               <h1 className="text-2xl font-semibold tracking-tight">
                 Quote {number}
               </h1>
-              <StatusBadge status={quote.status} />
+              <StatusBadge status={displayStatus} />
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               Prepared for {quote.customerCompanyName || quote.customerName}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="h-9"
-              disabled
-              title="Quote duplication is planned for a later sprint"
-            >
-              <Copy className="size-4" aria-hidden="true" />
-              Duplicate
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="h-9"
-              disabled
-              title="PDF generation is planned for a later sprint"
-            >
-              <Download className="size-4" aria-hidden="true" />
-              Download PDF
-            </Button>
+          <div className="flex w-full flex-wrap gap-2 xl:w-auto xl:justify-end">
             {quote.status === QuoteStatus.DRAFT && (
               <Link
                 href={`/quotes/${quote.id}/edit`}
@@ -129,6 +112,22 @@ export default async function QuoteDetailPage({
         </div>
       </div>
 
+      {expired && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
+          <AlertTriangle
+            className="mt-0.5 size-5 shrink-0"
+            aria-hidden="true"
+          />
+          <div>
+            <p className="text-sm font-semibold">This quote has expired</p>
+            <p className="mt-1 text-sm leading-6">
+              The customer can still view or decline it, but it can no longer
+              be accepted.
+            </p>
+          </div>
+        </div>
+      )}
+
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="grid gap-8 border-b p-5 sm:p-7 lg:grid-cols-[1fr_auto]">
@@ -140,7 +139,9 @@ export default async function QuoteDetailPage({
                   .map((part) => part.charAt(0).toUpperCase())
                   .join("")}
               </div>
-              <h2 className="mt-4 text-lg font-semibold">{organization.name}</h2>
+              <h2 className="mt-4 break-words text-lg font-semibold">
+                {organization.name}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Organisation quote
               </p>
@@ -153,7 +154,7 @@ export default async function QuoteDetailPage({
               <div>
                 <dt className="text-xs text-muted-foreground">Status</dt>
                 <dd className="mt-1 font-medium">
-                  <StatusBadge status={quote.status} />
+                  <StatusBadge status={displayStatus} />
                 </dd>
               </div>
               <div>
@@ -228,7 +229,7 @@ export default async function QuoteDetailPage({
         <Card>
           <CardContent className="p-5">
             <h2 className="text-sm font-semibold">Customer message</h2>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
               {quote.customerMessage || "No customer message was added."}
             </p>
           </CardContent>
@@ -236,7 +237,7 @@ export default async function QuoteDetailPage({
         <Card>
           <CardContent className="p-5">
             <h2 className="text-sm font-semibold">Internal notes</h2>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
               {quote.notes || "No internal notes were added."}
             </p>
           </CardContent>
@@ -244,7 +245,7 @@ export default async function QuoteDetailPage({
         <Card>
           <CardContent className="p-5">
             <h2 className="text-sm font-semibold">Terms</h2>
-            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
               {quote.terms || "No terms were added."}
             </p>
           </CardContent>

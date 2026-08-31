@@ -35,15 +35,15 @@ export default async function OnboardingPage() {
             Tell us about your business
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            We’ll use these details to shape your workspace and prepare your
-            quote templates.
+            Choose the business name customers should see on your quotes.
           </p>
         </div>
 
         <OnboardingForm />
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          You can update all business details later in Settings.
+          You can start adding customers and catalog items as soon as your
+          workspace is ready.
         </p>
       </div>
     </main>

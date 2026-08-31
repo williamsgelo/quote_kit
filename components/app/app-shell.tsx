@@ -1,11 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Bell,
   BookOpen,
   Boxes,
   FileText,
@@ -102,12 +101,12 @@ function SidebarContent({
       </nav>
       <div className="space-y-3 border-t border-white/10 p-3">
         <Link
-          href="/catalog"
+          href="/help"
           onClick={onNavigate}
-          className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-xs text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+          className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-xs text-slate-400 outline-none transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-400"
         >
           <BookOpen className="size-4" aria-hidden="true" />
-          QuoteKit guide
+          Help &amp; support
         </Link>
         <OrganisationSwitcher name={organization.name} inverted />
         <div className="rounded-lg bg-white p-0.5 text-slate-950">
@@ -125,6 +124,27 @@ export function AppShell({
   membershipRole,
 }: { children: ReactNode } & ShellData) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileCloseButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    mobileCloseButton.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileOpen]);
 
   return (
     <div className="min-h-dvh bg-slate-50">
@@ -144,8 +164,14 @@ export function AppShell({
             aria-label="Close navigation"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative h-full w-[min(82vw,18rem)] shadow-2xl">
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Application navigation"
+            className="relative h-full w-[min(82vw,18rem)] shadow-2xl"
+          >
             <button
+              ref={mobileCloseButton}
               type="button"
               aria-label="Close navigation"
               className="absolute top-4 -right-12 flex size-9 items-center justify-center rounded-lg bg-white text-slate-900 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
@@ -177,20 +203,8 @@ export function AppShell({
             <div className="hidden sm:block lg:hidden">
               <Logo compact href="/dashboard" />
             </div>
-            <div className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              All systems operational
-            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="relative flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Bell className="size-4" aria-hidden="true" />
-              <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-blue-600 ring-2 ring-background" />
-            </button>
+          <div className="flex items-center">
             <UserMenu
               user={user}
               membershipRole={membershipRole}

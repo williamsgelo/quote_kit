@@ -8,6 +8,7 @@ import { Logo } from "@/components/shared/logo";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { QuoteStatus } from "@/generated/prisma/client";
+import { formatCurrency } from "@/lib/money";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
 import { getPublicQuoteAndMarkViewed } from "@/lib/quotes/delivery-service";
 import { isQuoteExpired } from "@/lib/quotes/transitions";
@@ -57,7 +58,7 @@ export default async function PublicQuotePage({
         <Card className="overflow-hidden shadow-sm">
           <CardContent className="p-0">
             <div className="grid gap-8 border-b p-5 sm:p-8 lg:grid-cols-[1fr_auto]">
-              <div>
+              <div className="min-w-0">
                 <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white">
                   {quote.organization.name
                     .split(/\s+/)
@@ -65,7 +66,7 @@ export default async function PublicQuotePage({
                     .map((part) => part.charAt(0).toUpperCase())
                     .join("")}
                 </div>
-                <h1 className="mt-4 text-xl font-semibold">
+                <h1 className="mt-4 break-words text-xl font-semibold">
                   {quote.organization.name}
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -81,8 +82,10 @@ export default async function PublicQuotePage({
                 </div>
                 <div>
                   <dt className="text-xs text-muted-foreground">Total</dt>
-                  <dd className="mt-1 font-semibold">
-                    {quote.currency} {quote.total.toFixed(2)}
+                  <dd className="mt-1 font-semibold tabular-nums">
+                    {formatCurrency(quote.total.toFixed(2), {
+                      minimumFractionDigits: 2,
+                    })}
                   </dd>
                 </div>
                 <div>
@@ -101,7 +104,9 @@ export default async function PublicQuotePage({
                 <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   Prepared for
                 </p>
-                <h2 className="mt-2 font-semibold">{quote.customerName}</h2>
+                <h2 className="mt-2 break-words font-semibold">
+                  {quote.customerName}
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {quote.customerCompanyName || "Individual customer"}
                 </p>
@@ -157,7 +162,7 @@ export default async function PublicQuotePage({
               <Card>
                 <CardContent className="p-5">
                   <h2 className="text-sm font-semibold">Message</h2>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
                     {quote.customerMessage}
                   </p>
                 </CardContent>
@@ -167,7 +172,7 @@ export default async function PublicQuotePage({
               <Card>
                 <CardContent className="p-5">
                   <h2 className="text-sm font-semibold">Terms</h2>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
                     {quote.terms}
                   </p>
                 </CardContent>

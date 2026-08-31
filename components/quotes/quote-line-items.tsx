@@ -19,7 +19,50 @@ function formatQuantity(value: string) {
 
 export function QuoteLineItems({ items }: { items: QuoteLineItemView[] }) {
   return (
-    <div className="overflow-x-auto">
+    <>
+      <ul className="divide-y sm:hidden" aria-label="Quote line items">
+        {items.map((item) => (
+          <li key={item.id} className="space-y-4 px-5 py-5">
+            <div>
+              <p className="break-words font-medium">{item.name}</p>
+              {item.description && (
+                <p className="mt-1 whitespace-pre-wrap break-words text-xs leading-5 text-muted-foreground">
+                  {item.description}
+                </p>
+              )}
+            </div>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <div>
+                <dt className="text-xs text-muted-foreground">Quantity</dt>
+                <dd className="mt-1">
+                  {formatQuantity(item.quantity)} {item.unit}
+                </dd>
+              </div>
+              <div className="text-right">
+                <dt className="text-xs text-muted-foreground">Unit price</dt>
+                <dd className="mt-1 tabular-nums">
+                  {formatCurrency(item.unitPrice, {
+                    minimumFractionDigits: 2,
+                  })}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Tax</dt>
+                <dd className="mt-1">
+                  {formatDecimalPercentage(item.taxRate)}
+                </dd>
+              </div>
+              <div className="text-right">
+                <dt className="text-xs text-muted-foreground">Line total</dt>
+                <dd className="mt-1 font-semibold tabular-nums">
+                  {formatCurrency(item.total, { minimumFractionDigits: 2 })}
+                </dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto sm:block">
       <table className="w-full min-w-180 text-left text-sm">
         <caption className="sr-only">Quote line items</caption>
         <thead className="border-y bg-muted/35 text-xs text-muted-foreground">
@@ -35,9 +78,9 @@ export function QuoteLineItems({ items }: { items: QuoteLineItemView[] }) {
           {items.map((item) => (
             <tr key={item.id} className="border-b last:border-0">
               <td className="px-5 py-4">
-                <p className="font-medium">{item.name}</p>
+                <p className="break-words font-medium">{item.name}</p>
                 {item.description && (
-                  <p className="mt-1 max-w-lg whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
+                  <p className="mt-1 max-w-lg whitespace-pre-wrap break-words text-xs leading-5 text-muted-foreground">
                     {item.description}
                   </p>
                 )}
@@ -58,6 +101,7 @@ export function QuoteLineItems({ items }: { items: QuoteLineItemView[] }) {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }

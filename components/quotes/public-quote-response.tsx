@@ -47,6 +47,7 @@ export function PublicQuoteResponse({
       successfulState?.response === "ACCEPTED" || status === "ACCEPTED";
     return (
       <div
+        role="status"
         className={
           accepted
             ? "rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950"
@@ -83,10 +84,23 @@ export function PublicQuoteResponse({
           ? "This quote has expired and can no longer be accepted."
           : "Review the details above, then accept or decline this quote."}
       </p>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {!expired && (
-          <form action={acceptAction}>
-            <Button type="submit" size="lg" disabled={accepting || declining}>
+          <form
+            action={acceptAction}
+            className="w-full sm:w-auto"
+            onSubmit={(event) => {
+              if (!window.confirm("Accept this quote? This response is final.")) {
+                event.preventDefault();
+              }
+            }}
+          >
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full sm:w-auto"
+              disabled={accepting || declining}
+            >
               {accepting && (
                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
               )}
@@ -94,17 +108,26 @@ export function PublicQuoteResponse({
             </Button>
           </form>
         )}
-        <form action={declineAction}>
+        <form
+          action={declineAction}
+          className="w-full sm:w-auto"
+          onSubmit={(event) => {
+            if (!window.confirm("Decline this quote? This response is final.")) {
+              event.preventDefault();
+            }
+          }}
+        >
           <Button
             type="submit"
             size="lg"
-            variant="outline"
+            variant="destructive"
+            className="w-full sm:w-auto"
             disabled={accepting || declining}
           >
             {declining && (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             )}
-            {declining ? "Declining…" : "Confirm decline"}
+            {declining ? "Declining…" : "Decline quote"}
           </Button>
         </form>
       </div>

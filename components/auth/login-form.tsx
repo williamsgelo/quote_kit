@@ -102,14 +102,9 @@ export function LoginForm({
           <label htmlFor="password" className="text-sm font-medium">
             Password
           </label>
-          <button
-            type="button"
-            disabled
-            title="Password reset is not available yet"
-            className="text-xs font-medium text-muted-foreground"
-          >
-            Forgot password?
-          </button>
+          <span className="text-right text-xs text-muted-foreground">
+            Password reset is not available yet
+          </span>
         </div>
         <Input
           id="password"

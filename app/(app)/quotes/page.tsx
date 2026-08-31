@@ -12,10 +12,18 @@ import { requireOrganization } from "@/lib/auth/access";
 import { formatCurrency } from "@/lib/money";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
 import { listQuotesForOrganization } from "@/lib/quotes/queries";
+import { isQuoteExpired } from "@/lib/quotes/transitions";
 import { cn } from "@/lib/utils";
 
 const selectStyles =
   "h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20";
+const statusFilters = [
+  QuoteStatus.DRAFT,
+  QuoteStatus.SENT,
+  QuoteStatus.VIEWED,
+  QuoteStatus.ACCEPTED,
+  QuoteStatus.DECLINED,
+] as const;
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("en-ZA", {
@@ -27,10 +35,16 @@ function formatDate(date: Date) {
 }
 
 function selectedStatus(value: unknown) {
-  return typeof value === "string" &&
-    Object.values(QuoteStatus).includes(value as QuoteStatus)
+  return typeof value === "string" && statusFilters.includes(value as never)
     ? (value as QuoteStatus)
     : undefined;
+}
+
+function displayStatus(status: QuoteStatus, expiryDate: Date) {
+  return (status === QuoteStatus.SENT || status === QuoteStatus.VIEWED) &&
+    isQuoteExpired(expiryDate)
+    ? QuoteStatus.EXPIRED
+    : status;
 }
 
 export default async function QuotesPage({
@@ -51,7 +65,7 @@ export default async function QuotesPage({
     <div className="space-y-6">
       <PageHeader
         title="Quotes"
-        description="Create, save, and manage customer quote drafts."
+        description="Create, send, and track customer quotes from draft to response."
         actions={
           <Link
             href="/quotes/new"
@@ -83,7 +97,7 @@ export default async function QuotesPage({
             aria-label="Quote status"
           >
             <option value="">All statuses</option>
-            {Object.values(QuoteStatus).map((value) => (
+            {statusFilters.map((value) => (
               <option key={value} value={value}>
                 {value.charAt(0) + value.slice(1).toLowerCase()}
               </option>
@@ -130,7 +144,9 @@ export default async function QuotesPage({
                     </p>
                   </td>
                   <td className={tableStyles.cell}>
-                    <StatusBadge status={quote.status} />
+                    <StatusBadge
+                      status={displayStatus(quote.status, quote.expiryDate)}
+                    />
                   </td>
                   <td className={`${tableStyles.cell} text-muted-foreground`}>
                     {formatDate(quote.issueDate)}

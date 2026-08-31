@@ -25,6 +25,7 @@ import { formatCurrency } from "@/lib/money";
 import { formatQuoteNumber } from "@/lib/quotes/numbering";
 import { quoteActivityLabel } from "@/lib/quotes/activity";
 import { getQuoteDashboardForOrganization } from "@/lib/quotes/queries";
+import { isQuoteExpired } from "@/lib/quotes/transitions";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
@@ -35,8 +36,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-7">
       <PageHeader
-        title={`Good morning, ${firstName}`}
-        description="Here’s what’s happening with your quotes and customers today."
+        title={`Welcome back, ${firstName}`}
+        description="Here’s the latest activity across your quotes and customers."
         actions={
           <Link
             href="/quotes/new"
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
             <div>
               <CardTitle>Recent quotes</CardTitle>
               <CardDescription className="mt-1">
-                Your latest customer drafts
+                Your latest customer quotes
               </CardDescription>
             </div>
             <Link
@@ -131,7 +132,14 @@ export default async function DashboardPage() {
                       </p>
                     </td>
                     <td className="px-4 py-3.5">
-                      <StatusBadge status={quote.status} />
+                      <StatusBadge
+                        status={
+                          (quote.status === "SENT" || quote.status === "VIEWED") &&
+                          isQuoteExpired(quote.expiryDate)
+                            ? "EXPIRED"
+                            : quote.status
+                        }
+                      />
                     </td>
                     <td className="px-5 py-3.5 text-right font-medium">
                       {formatCurrency(quote.total.toString(), {

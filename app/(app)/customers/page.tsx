@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Filter, MoreHorizontal, Plus, UserRoundPlus } from "lucide-react";
+import { MoreHorizontal, Plus, UserRoundPlus } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchInput } from "@/components/shared/search-input";
 import { TableShell, tableStyles } from "@/components/shared/table-shell";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { requireOrganization } from "@/lib/auth/access";
 import { listCustomersForOrganization } from "@/lib/customers/queries";
 import { cn } from "@/lib/utils";
@@ -74,17 +74,6 @@ export default async function CustomersPage({
           </button>
         </form>
         <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="h-9"
-            disabled
-            title="Archived customer filters are not available yet"
-          >
-            <Filter className="size-4" aria-hidden="true" />
-            Filter
-          </Button>
           <Badge variant="secondary" className="h-7 rounded-lg px-2.5">
             {customers.length} {customers.length === 1 ? "customer" : "customers"}
           </Badge>
@@ -134,7 +123,10 @@ export default async function CustomersPage({
                     </p>
                   </td>
                   <td className={tableStyles.cell}>
-                    <Badge variant="outline">0 quotes</Badge>
+                    <Badge variant="outline">
+                      {customer._count.quotes}{" "}
+                      {customer._count.quotes === 1 ? "quote" : "quotes"}
+                    </Badge>
                   </td>
                   <td className={`${tableStyles.cell} text-muted-foreground`}>
                     {activityLabel(customer.createdAt, customer.updatedAt)}

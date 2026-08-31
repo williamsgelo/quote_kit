@@ -74,6 +74,7 @@ export function listCustomersForOrganization(
         phone: true,
         createdAt: true,
         updatedAt: true,
+        _count: { select: { quotes: true } },
       },
     }),
   );
@@ -89,7 +90,21 @@ export function getCustomerForOrganization(
         id: customerId,
         organizationId,
       },
-      select: customerDetailSelect,
+      select: {
+        ...customerDetailSelect,
+        quotes: {
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: 5,
+          select: {
+            id: true,
+            quoteNumber: true,
+            status: true,
+            issueDate: true,
+            expiryDate: true,
+            total: true,
+          },
+        },
+      },
     }),
   );
 }

@@ -26,19 +26,25 @@ export function QuoteDeliveryActions({
     sendQuoteAction.bind(null, quoteId),
     INITIAL_STATE,
   );
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
   const publicUrl = state.publicUrl ?? initialPublicUrl;
 
   async function copyPublicUrl() {
     if (!publicUrl) return;
-    await navigator.clipboard.writeText(publicUrl);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2_000);
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      setCopyStatus("copied");
+      window.setTimeout(() => setCopyStatus("idle"), 2_000);
+    } catch {
+      setCopyStatus("error");
+    }
   }
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <div className="flex flex-wrap justify-end gap-2">
+    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
         {canSend && (
           <form action={action}>
             <Button type="submit" size="lg" className="h-9" disabled={pending}>
@@ -61,12 +67,12 @@ export function QuoteDeliveryActions({
               className="h-9"
               onClick={copyPublicUrl}
             >
-              {copied ? (
+              {copyStatus === "copied" ? (
                 <Check className="size-4" aria-hidden="true" />
               ) : (
                 <Copy className="size-4" aria-hidden="true" />
               )}
-              {copied ? "Copied" : "Copy public link"}
+              {copyStatus === "copied" ? "Copied" : "Copy public link"}
             </Button>
             <Link
               href={publicUrl}
@@ -94,6 +100,12 @@ export function QuoteDeliveryActions({
           }
         >
           {state.message}
+        </p>
+      )}
+      {copyStatus === "error" && (
+        <p role="alert" className="text-xs text-destructive sm:text-right">
+          The link could not be copied. Open the public quote and copy its URL
+          from your browser.
         </p>
       )}
     </div>

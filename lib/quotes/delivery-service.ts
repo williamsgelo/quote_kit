@@ -137,16 +137,18 @@ function quoteEmailContent(quote: {
   const safeUrl = escapeHtml(quote.publicUrl);
 
   return {
-    subject: `${number} from ${quote.organization.name}`,
+    subject: `Quote ${number} from ${quote.organization.name}`,
     text: [
       `Hello ${quote.customerName},`,
       "",
-      `${quote.organization.name} has sent you quote ${number} for ${total}.`,
-      `It is valid until ${expiryDate}.`,
+      `${quote.organization.name} has sent you a quote.`,
+      `Quote number: ${number}`,
+      `Total: ${total}`,
+      `Valid until: ${expiryDate}`,
       "",
       `View quote: ${quote.publicUrl}`,
     ].join("\n"),
-    html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#0f172a;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:32px"><h1 style="font-size:24px">Quote ${safeNumber}</h1><p>Hello ${customer},</p><p>${business} has sent you a quote for <strong>${safeTotal}</strong>, valid until ${safeExpiry}.</p><p style="margin:28px 0"><a href="${safeUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">View Quote</a></p><p style="font-size:12px;color:#64748b">If the button does not work, open ${safeUrl}</p></div></body></html>`,
+    html: `<!doctype html><html><body style="margin:0;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a;line-height:1.6"><div style="max-width:600px;margin:0 auto;padding:24px 16px"><div style="border:1px solid #e2e8f0;border-radius:12px;background:#ffffff;padding:28px"><p style="margin:0;color:#475569;font-size:14px;font-weight:600">${business}</p><h1 style="margin:8px 0 20px;font-size:24px;line-height:1.25">Quote ${safeNumber}</h1><p>Hello ${customer},</p><p>${business} has sent you a quote.</p><table role="presentation" style="width:100%;margin:20px 0;border-collapse:collapse"><tr><td style="padding:10px 0;color:#64748b;font-size:14px">Total</td><td style="padding:10px 0;text-align:right;font-weight:700">${safeTotal}</td></tr><tr><td style="border-top:1px solid #e2e8f0;padding:10px 0;color:#64748b;font-size:14px">Valid until</td><td style="border-top:1px solid #e2e8f0;padding:10px 0;text-align:right">${safeExpiry}</td></tr></table><p style="margin:28px 0"><a href="${safeUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">View quote</a></p><p style="margin-bottom:0;font-size:12px;color:#64748b;word-break:break-all">If the button does not work, open ${safeUrl}</p></div></div></body></html>`,
   };
 }
 

@@ -14,7 +14,7 @@ export function QuoteSummary({
   const hasDiscount = discountAmount !== "0.00";
 
   return (
-    <dl className="ml-auto w-full max-w-sm space-y-3 px-5 py-5 text-sm">
+    <dl className="ml-auto w-full max-w-sm space-y-3 px-5 py-5 text-sm tabular-nums">
       <div className="flex items-center justify-between">
         <dt className="text-muted-foreground">Subtotal</dt>
         <dd className="font-medium">
@@ -37,7 +37,7 @@ export function QuoteSummary({
       </div>
       <div className="flex items-center justify-between border-t pt-3 text-base">
         <dt className="font-semibold">Total</dt>
-        <dd className="text-xl font-semibold tracking-tight">
+        <dd className="pl-4 text-right text-xl font-semibold tracking-tight">
           {formatCurrency(total, { minimumFractionDigits: 2 })}
         </dd>
       </div>

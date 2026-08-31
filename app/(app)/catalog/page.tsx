@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Filter, MoreHorizontal, PackagePlus, Plus } from "lucide-react";
+import { MoreHorizontal, PackagePlus, Plus } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchInput } from "@/components/shared/search-input";
 import { TableShell, tableStyles } from "@/components/shared/table-shell";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { requireOrganization } from "@/lib/auth/access";
 import { listCatalogItemsForOrganization } from "@/lib/catalog/queries";
 import { formatCurrency, formatDecimalPercentage } from "@/lib/money";
@@ -59,17 +59,6 @@ export default async function CatalogPage({
           </button>
         </form>
         <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="h-9"
-            disabled
-            title="Additional catalog filters are not available yet"
-          >
-            <Filter className="size-4" aria-hidden="true" />
-            Filter
-          </Button>
           <Badge variant="secondary" className="h-7 rounded-lg px-2.5">
             {catalogItems.length} {catalogItems.length === 1 ? "item" : "items"}
           </Badge>

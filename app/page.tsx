@@ -91,7 +91,7 @@ export default function HomePage() {
                 Simple quoting for growing teams
               </div>
               <h1 className="mt-6 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-[-0.035em] text-balance sm:text-5xl lg:text-6xl">
-                Turn good conversations into signed work.
+                Turn good conversations into accepted work.
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
                 QuoteKit helps service businesses create polished quotes, follow
@@ -115,7 +115,7 @@ export default function HomePage() {
                     "h-11 px-5 text-sm",
                   )}
                 >
-                  View dashboard demo
+                  Log in to your workspace
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
@@ -305,8 +305,7 @@ export default function HomePage() {
             Make your next quote your best one.
           </h2>
           <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
-            Create a workspace and explore the full QuoteKit experience with
-            realistic sample data.
+            Create a workspace and build your first customer quote in minutes.
           </p>
           <Link
             href="/signup"

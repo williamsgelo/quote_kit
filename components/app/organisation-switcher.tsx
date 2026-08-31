@@ -14,6 +14,7 @@ export function OrganisationSwitcher({
   return (
     <details className="group relative">
       <summary
+        aria-label={`Current workspace: ${name}`}
         className={cn(
           "flex h-10 cursor-pointer list-none items-center gap-2 rounded-lg border px-2.5 text-left text-sm transition-colors marker:hidden [&::-webkit-details-marker]:hidden",
           inverted
@@ -48,22 +49,20 @@ export function OrganisationSwitcher({
         <p className="px-2 py-1.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
           Workspaces
         </p>
-        <button
-          type="button"
-          disabled
-          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        <div
+          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs"
         >
           <span className="flex size-6 items-center justify-center rounded bg-primary text-white">
             {initial}
           </span>
           <span className="flex-1 truncate font-medium">{name}</span>
           <Check className="size-3.5 text-primary" aria-hidden="true" />
-        </button>
+        </div>
         <button
           type="button"
           disabled
           title="Additional workspaces are not available yet"
-          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-muted-foreground opacity-60"
+          className="flex w-full cursor-not-allowed items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-muted-foreground opacity-60"
         >
           <Plus className="size-4" aria-hidden="true" />
           Create workspace

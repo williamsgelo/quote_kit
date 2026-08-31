@@ -26,7 +26,7 @@ QuoteKit is a multi-tenant SaaS quotation platform built with the Next.js App Ro
    npx auth secret
    ```
 
-`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `APP_URL` is server-only and must be the canonical HTTPS origin in production. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
+`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `SUPPORT_EMAIL` optionally configures the mailto contact shown on the Help & Support page. `APP_URL` is server-only and must be the canonical HTTPS origin in production. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
 
 ## Prisma and database
 
@@ -67,7 +67,7 @@ Open [http://localhost:3000](http://localhost:3000). Integration tests require a
 5. Sign out and confirm a protected URL such as `/dashboard` redirects to `/login`.
 6. Log back in and confirm the existing membership sends the user directly to the dashboard.
 
-The shared server application layout protects `/dashboard`, `/customers`, `/catalog`, `/quotes`, and `/settings`. Active organisation selection uses the authenticated user's first active membership ordered by membership creation time and ID. Browser-provided user IDs, roles, and organisation IDs are never trusted.
+The shared server application layout protects `/dashboard`, `/customers`, `/catalog`, `/quotes`, `/settings`, and `/help`. Active organisation selection uses the authenticated user's first active membership ordered by membership creation time and ID. Browser-provided user IDs, roles, and organisation IDs are never trusted.
 
 ## Customer management
 

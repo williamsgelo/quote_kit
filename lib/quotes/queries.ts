@@ -224,6 +224,8 @@ export async function getDraftQuoteForEditing(
 
 export function getQuoteDashboardForOrganization(organizationId: string) {
   return retryTransientDatabaseRead(async () => {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
     const [
       totalQuotes,
       draftQuotes,
@@ -242,6 +244,7 @@ export function getQuoteDashboardForOrganization(organizationId: string) {
           where: {
             organizationId,
             status: { in: [QuoteStatus.SENT, QuoteStatus.VIEWED] },
+            expiryDate: { gte: today },
           },
         }),
         prisma.quote.count({
@@ -264,6 +267,7 @@ export function getQuoteDashboardForOrganization(organizationId: string) {
             customerName: true,
             customerCompanyName: true,
             status: true,
+            expiryDate: true,
             total: true,
           },
         }),
