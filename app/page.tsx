@@ -20,10 +20,13 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  homepageStructuredData,
+  serializeJsonLd,
+} from "@/lib/homepage-structured-data";
+import {
   HOMEPAGE_DESCRIPTION,
   HOMEPAGE_TITLE,
   SITE_NAME,
-  SITE_ORIGIN,
 } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -151,35 +154,13 @@ const questions = [
   },
 ];
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_ORIGIN}/#website`,
-      url: `${SITE_ORIGIN}/`,
-      name: SITE_NAME,
-      description: HOMEPAGE_DESCRIPTION,
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": `${SITE_ORIGIN}/#software`,
-      name: SITE_NAME,
-      url: `${SITE_ORIGIN}/`,
-      applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      description: HOMEPAGE_DESCRIPTION,
-    },
-  ],
-};
-
 export default function HomePage() {
   return (
     <div className="min-h-dvh bg-[#fbfbfc]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          __html: serializeJsonLd(homepageStructuredData),
         }}
       />
 

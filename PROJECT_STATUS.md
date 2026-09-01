@@ -49,7 +49,9 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 - Added `app/sitemap.ts` containing only `https://quotevia.co.za/`.
 - Added `X-Robots-Tag: noindex, nofollow` response headers for Auth/API and secure Quote paths.
 - Added a permanent `www.quotevia.co.za` to `quotevia.co.za` redirect when the request reaches the application on the www host.
-- Added accurate WebSite and SoftwareApplication JSON-LD without offers, prices, ratings, reviews, or other fabricated properties.
+- Added a linked homepage JSON-LD graph with Organization, WebSite, WebPage, and SoftwareApplication nodes.
+- The Organization business entity includes the canonical URL and a crawlable 180×180 logo, while omitting unverified physical location, opening hours, reviews, ratings, and other fabricated properties.
+- The WebSite identifies the Organization as publisher; the WebPage connects the site, business, primary social image, and software product through stable `@id` references.
 - FAQ structured data was intentionally omitted; the FAQ remains visible content, but QuoteVia is not eligible for Google's limited FAQ rich-result treatment.
 - Replaced the placeholder favicon with a branded SVG icon and added a generated Apple touch icon.
 - Added a 1200×630 branded Open Graph image reused for Twitter cards.
@@ -66,10 +68,10 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 
 - TypeScript: passed.
 - ESLint: passed with no warnings.
-- Unit tests: 36 passed.
+- Unit tests: 39 passed, including homepage entity-linking, organization-logo, and safe JSON-LD serialization coverage.
 - Integration tests: the sandboxed aggregate run could not connect to PostgreSQL; the approved network retry passed all 34 integration tests.
 - Production build: passed; `/`, `/apple-icon`, `/icon.svg`, `/opengraph-image`, `/robots.txt`, and `/sitemap.xml` are statically generated.
-- Production homepage HTML: one H1; correct title, description, canonical, index/follow, Open Graph, Twitter, and syntactically valid JSON-LD.
+- Production homepage HTML: one H1; correct title, description, canonical, index/follow, Open Graph, Twitter, and syntactically valid linked Organization, WebSite, WebPage, and SoftwareApplication JSON-LD.
 - `/login` and `/signup`: rendered `noindex, nofollow`.
 - Invalid `/q/[token]`: returned 404 and rendered the shared Quote-route noindex metadata.
 - `/dashboard`: continued to redirect unauthenticated requests to `/login`; the authenticated layout contains the shared noindex metadata.

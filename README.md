@@ -71,7 +71,7 @@ The shared server application layout protects `/dashboard`, `/customers`, `/cata
 
 ## Launch SEO
 
-The homepage is the only route included in `sitemap.xml`. It has a self-referencing canonical on `https://quotevia.co.za/`, index/follow metadata, Open Graph and Twitter metadata, and accurate WebSite and SoftwareApplication JSON-LD. `robots.txt` references the sitemap and keeps API and authenticated application paths out of crawl queues. API and secure Quote responses also receive `X-Robots-Tag: noindex, nofollow`, and requests reaching the app on `www.quotevia.co.za` permanently redirect to the canonical non-www origin.
+The homepage is the only route included in `sitemap.xml`. It has a self-referencing canonical on `https://quotevia.co.za/`, index/follow metadata, Open Graph and Twitter metadata, and linked Organization, WebSite, WebPage, and SoftwareApplication JSON-LD. The Organization node identifies the online business and its crawlable logo without claiming an unverified physical location, opening hours, reviews, or ratings. `robots.txt` references the sitemap and keeps API and authenticated application paths out of crawl queues. API and secure Quote responses also receive `X-Robots-Tag: noindex, nofollow`, and requests reaching the app on `www.quotevia.co.za` permanently redirect to the canonical non-www origin.
 
 Authentication, onboarding, authenticated application layouts, and `/q/[token]` use page or shared-layout `noindex, nofollow` metadata. Secure customer Quote URLs are never added to the sitemap. The authenticated `/help` page is intentionally noindex until a separate public help resource exists.
 
