@@ -34,7 +34,7 @@ export default async function LoginPage({
     <div className="w-full">
       <p className="text-sm font-medium text-primary">Welcome back</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Log in to QuoteKit
+        Log in to QuoteVia
       </h1>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         Pick up where you left off and keep your quotes moving.
@@ -46,7 +46,7 @@ export default async function LoginPage({
       />
 
       <p className="mt-7 text-center text-sm text-muted-foreground">
-        New to QuoteKit?{" "}
+        New to QuoteVia?{" "}
         <Link href="/signup" className="font-medium text-primary hover:underline">
           Create an account
         </Link>

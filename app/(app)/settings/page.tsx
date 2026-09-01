@@ -77,7 +77,7 @@ export default async function SettingsPage() {
               <div>
                 <CardTitle>Account</CardTitle>
                 <CardDescription className="mt-1">
-                  The signed-in account for this QuoteKit session.
+                  The signed-in account for this QuoteVia session.
                 </CardDescription>
               </div>
             </div>

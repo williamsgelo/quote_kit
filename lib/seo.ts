@@ -1,10 +1,10 @@
 const FALLBACK_SITE_ORIGIN = "https://quotevia.co.za";
 
-export const SITE_NAME = "QuoteKit";
+export const SITE_NAME = "QuoteVia";
 export const HOMEPAGE_TITLE =
-  "Online Quote Tool for Small Businesses | QuoteKit";
+  "Online Quote Tool for Small Businesses | QuoteVia";
 export const HOMEPAGE_DESCRIPTION =
-  "Create professional quotes, send them online, track when customers view them, and get approvals faster with QuoteKit.";
+  "Create professional quotes, send them online, track when customers view them, and get approvals faster with QuoteVia.";
 
 function resolveSiteOrigin(value = process.env.APP_URL) {
   const candidate = value?.trim() || FALLBACK_SITE_ORIGIN;

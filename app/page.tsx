@@ -45,7 +45,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "QuoteKit online quotation software",
+        alt: "QuoteVia online quotation software",
       },
     ],
   },
@@ -101,7 +101,7 @@ const workflow = [
     icon: CheckCircle2,
     step: "04",
     title: "4. Get a decision",
-    text: "The customer can view, accept, or decline while you follow the quote status from QuoteKit.",
+    text: "The customer can view, accept, or decline while you follow the quote status from QuoteVia.",
   },
 ];
 
@@ -137,15 +137,15 @@ const questions = [
   {
     question: "What happens after I send a quote?",
     answer:
-      "QuoteKit emails the customer a secure link. You can see when the quote is viewed, and the customer can accept or decline it online.",
+      "QuoteVia emails the customer a secure link. You can see when the quote is viewed, and the customer can accept or decline it online.",
   },
   {
     question: "Can I include tax and discounts?",
     answer:
-      "Yes. QuoteKit calculates line totals, quote-level discounts, tax, and the final amount using decimal-safe server-side calculations.",
+      "Yes. QuoteVia calculates line totals, quote-level discounts, tax, and the final amount using decimal-safe server-side calculations.",
   },
   {
-    question: "Is QuoteKit suitable for South African businesses?",
+    question: "Is QuoteVia suitable for South African businesses?",
     answer:
       "Yes. The current product supports South African rand pricing and is designed for small service businesses that need a practical quotation workflow.",
   },
@@ -239,7 +239,7 @@ export default function HomePage() {
                 Create Professional Quotes Online in Minutes
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-                QuoteKit helps small service businesses create accurate customer
+                QuoteVia helps small service businesses create accurate customer
                 quotations, send them through a secure online link, and track
                 every view, acceptance, or decline. Keep pricing, tax, discounts,
                 and quote status together instead of chasing Word files and PDF
@@ -263,7 +263,7 @@ export default function HomePage() {
                     "h-11 px-5 text-sm",
                   )}
                 >
-                  Log in to QuoteKit
+                  Log in to QuoteVia
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
@@ -402,7 +402,7 @@ export default function HomePage() {
                 A clearer workflow
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-                How QuoteKit works
+                How QuoteVia works
               </h2>
               <p className="mt-4 text-sm leading-6 text-slate-400">
                 Keep each step visible from the first customer conversation to a
@@ -446,7 +446,7 @@ export default function HomePage() {
               Built for small service businesses
             </h2>
             <p className="mt-4 leading-7 text-muted-foreground">
-              QuoteKit is focused quoting software for businesses that sell
+              QuoteVia is focused quoting software for businesses that sell
               expertise, labour, projects, and recurring services rather than
               complex inventory.
             </p>
@@ -495,7 +495,7 @@ export default function HomePage() {
         <section className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <p className="text-sm font-medium text-primary">Start simply</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-            Create your next professional quote with QuoteKit
+            Create your next professional quote with QuoteVia
           </h2>
           <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
             Set up a workspace, add a customer, and build a quotation with clear
@@ -525,7 +525,7 @@ export default function HomePage() {
               Create an account
             </Link>
           </nav>
-          <p>© 2026 QuoteKit · quotevia.co.za</p>
+          <p>© 2026 QuoteVia · quotevia.co.za</p>
         </div>
       </footer>
     </div>

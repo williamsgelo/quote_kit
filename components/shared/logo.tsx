@@ -15,7 +15,7 @@ export function Logo({
   return (
     <Link
       href={href}
-      aria-label="QuoteKit home"
+      aria-label="QuoteVia home"
       className={cn(
         "inline-flex items-center gap-2 font-semibold tracking-tight",
         className,
@@ -24,7 +24,7 @@ export function Logo({
       <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
         <FileCheck2 className="size-4.5" aria-hidden="true" />
       </span>
-      {!compact && <span className="text-lg">QuoteKit</span>}
+      {!compact && <span className="text-lg">QuoteVia</span>}
     </Link>
   );
 }

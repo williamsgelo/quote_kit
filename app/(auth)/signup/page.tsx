@@ -23,13 +23,13 @@ export default async function SignupPage() {
         Create your account
       </h1>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        Set up your QuoteKit workspace in just a few minutes.
+        Set up your QuoteVia workspace in just a few minutes.
       </p>
 
       <SignupForm />
 
       <p className="mt-5 text-xs leading-5 text-muted-foreground">
-        By continuing, you agree to the QuoteKit Terms of Service and Privacy
+        By continuing, you agree to the QuoteVia Terms of Service and Privacy
         Policy.
       </p>
       <p className="mt-6 text-center text-sm text-muted-foreground">

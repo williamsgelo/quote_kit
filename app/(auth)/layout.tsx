@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           {children}
         </div>
         <p className="text-center text-xs text-muted-foreground">
-          © 2026 QuoteKit
+          © 2026 QuoteVia
         </p>
       </div>
       <aside className="relative hidden overflow-hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
@@ -54,7 +54,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               />
             </div>
             <p className="pt-4 text-sm leading-6 text-slate-300">
-              “QuoteKit gives us a calm, practical view of the work we’re about
+              “QuoteVia gives us a calm, practical view of the work we’re about
               to win.”
             </p>
           </div>

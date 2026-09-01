@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: SITE_URL,
   title: {
     default: HOMEPAGE_TITLE,
-    template: "%s | QuoteKit",
+    template: "%s | QuoteVia",
   },
   description: HOMEPAGE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "QuoteKit online quotation software",
+        alt: "QuoteVia online quotation software",
       },
     ],
   },

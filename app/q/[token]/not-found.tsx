@@ -13,7 +13,7 @@ export default function PublicQuoteNotFound() {
           This public quote link is invalid, inactive, or no longer available.
         </p>
         <Link href="/" className={`${buttonVariants()} mt-6`}>
-          Return to QuoteKit
+          Return to QuoteVia
         </Link>
       </div>
     </main>

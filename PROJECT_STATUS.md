@@ -1,8 +1,14 @@
-# QuoteKit Project Status
+# QuoteVia Project Status
 
 ## Current sprint
 
 Sprint 11: Technical and on-page launch SEO — implementation complete.
+
+## QuoteVia branding alignment
+
+- Replaced the previous customer-facing brand name with QuoteVia across the shared logo, marketing page, authentication pages, authenticated help/settings copy, and public Quote fallback navigation.
+- Updated the default page-title template, homepage SEO title and description, application name, Open Graph/Twitter metadata, social-image text, image alt text, favicon label, email sender example, and fallback support address.
+- Kept internal package names, development IDs, and architecture terminology unchanged because they are not exposed as product branding.
 
 ## SEO audit baseline
 
@@ -24,8 +30,8 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 
 ## Homepage SEO delivered
 
-- Final title: `Online Quote Tool for Small Businesses | QuoteKit`.
-- Final description: `Create professional quotes, send them online, track when customers view them, and get approvals faster with QuoteKit.`
+- Final title: `Online Quote Tool for Small Businesses | QuoteVia`.
+- Final description: `Create professional quotes, send them online, track when customers view them, and get approvals faster with QuoteVia.`
 - Final H1: `Create Professional Quotes Online in Minutes`.
 - Expanded human-first content around online quotations, customers, reusable services, quantities, prices, tax, discounts, secure sending, views, accept/decline responses, and status tracking.
 - Added logical H2/H3 sections for product capabilities, the four-step workflow, service-business use cases, visible questions, and the closing call to action.
@@ -44,7 +50,7 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 - Added `X-Robots-Tag: noindex, nofollow` response headers for Auth/API and secure Quote paths.
 - Added a permanent `www.quotevia.co.za` to `quotevia.co.za` redirect when the request reaches the application on the www host.
 - Added accurate WebSite and SoftwareApplication JSON-LD without offers, prices, ratings, reviews, or other fabricated properties.
-- FAQ structured data was intentionally omitted; the FAQ remains visible content, but QuoteKit is not eligible for Google's limited FAQ rich-result treatment.
+- FAQ structured data was intentionally omitted; the FAQ remains visible content, but QuoteVia is not eligible for Google's limited FAQ rich-result treatment.
 - Replaced the placeholder favicon with a branded SVG icon and added a generated Apple touch icon.
 - Added a 1200×630 branded Open Graph image reused for Twitter cards.
 - Installed Google Tag Manager container `GTM-NNNSRZSB` in the root layout without adding a third-party analytics package; the bootstrap runs in the head and the fallback iframe renders immediately after the opening body tag.

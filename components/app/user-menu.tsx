@@ -30,7 +30,7 @@ const roleLabels = {
 } as const;
 
 function getInitials(name: string | null, email: string | null) {
-  const source = name?.trim() || email?.trim() || "QuoteKit User";
+  const source = name?.trim() || email?.trim() || "QuoteVia User";
   const parts = source.split(/\s+/).filter(Boolean);
 
   return parts
@@ -63,7 +63,7 @@ export function UserMenu({
   membershipRole,
   compact = false,
 }: UserMenuProps) {
-  const displayName = user.name?.trim() || user.email || "QuoteKit user";
+  const displayName = user.name?.trim() || user.email || "QuoteVia user";
   const roleLabel = roleLabels[membershipRole];
 
   return (

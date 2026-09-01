@@ -1,6 +1,6 @@
-# QuoteKit
+# QuoteVia
 
-QuoteKit is a multi-tenant SaaS quotation platform built with the Next.js App Router, TypeScript, PostgreSQL, Prisma, Auth.js, Tailwind CSS, and shadcn/ui.
+QuoteVia is a multi-tenant SaaS quotation platform built with the Next.js App Router, TypeScript, PostgreSQL, Prisma, Auth.js, Tailwind CSS, and shadcn/ui.
 
 ## Requirements
 
@@ -26,7 +26,7 @@ QuoteKit is a multi-tenant SaaS quotation platform built with the Next.js App Ro
    npx auth secret
    ```
 
-`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `SUPPORT_EMAIL` optionally configures the mailto contact shown on the Help & Support page. `APP_URL` is server-only and supplies both secure Quote links and the canonical SEO origin; production must set it to `https://quotevia.co.za`. QuoteKit explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
+`DATABASE_URL` and `AUTH_SECRET` are required. `AUTH_URL` is optional when Auth.js cannot correctly infer the public deployment origin. Quote delivery additionally requires a trusted `APP_URL`, `RESEND_API_KEY`, and verified `EMAIL_FROM`. `SUPPORT_EMAIL` optionally configures the mailto contact shown on the Help & Support page. `APP_URL` is server-only and supplies both secure Quote links and the canonical SEO origin; production must set it to `https://quotevia.co.za`. QuoteVia explicitly trusts the host received by its Next.js server, so production infrastructure must reject arbitrary Host headers and supply the canonical public host. Seed variables are development-only and must not be set in production.
 
 ## Prisma and database
 
@@ -103,7 +103,7 @@ Browser-submitted organisation IDs, quote numbers, statuses, and totals are igno
 
 ## Quote delivery and public responses
 
-A DRAFT Quote with a Customer email address can be sent from its internal detail page. QuoteKit generates one cryptographically secure 256-bit base64url token and sends a simple transactional email through the Resend HTTP API. Public links use `/q/<token>` and contain no quote number, database ID, user ID, or organisation ID. Configure and verify the `EMAIL_FROM` sender in Resend before testing delivery.
+A DRAFT Quote with a Customer email address can be sent from its internal detail page. QuoteVia generates one cryptographically secure 256-bit base64url token and sends a simple transactional email through the Resend HTTP API. Public links use `/q/<token>` and contain no quote number, database ID, user ID, or organisation ID. Configure and verify the `EMAIL_FROM` sender in Resend before testing delivery.
 
 The public page is available without an account and renders persisted Quote/QuoteItem snapshots, the customer-visible message, and terms. It never selects or renders internal notes, membership data, or authentication data. First access records one VIEWED activity and timestamp; refreshes are idempotent. The internal link owner opening the link also counts as the first view for this MVP.
 

@@ -31,10 +31,10 @@ const questions = [
   {
     question: "How does a customer receive a quote?",
     answer:
-      "QuoteKit emails the customer a secure View quote link when you use Send quote. You can also copy the same link from the quote detail page.",
+      "QuoteVia emails the customer a secure View quote link when you use Send quote. You can also copy the same link from the quote detail page.",
   },
   {
-    question: "Does the customer need a QuoteKit account?",
+    question: "Does the customer need a QuoteVia account?",
     answer:
       "No. The secure public link opens the customer-facing quote without login.",
   },
@@ -53,14 +53,14 @@ const questions = [
 export default function HelpPage() {
   const supportEmail = getSupportEmail();
   const supportHref = `mailto:${supportEmail}?subject=${encodeURIComponent(
-    "QuoteKit support request",
+    "QuoteVia support request",
   )}`;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Help & support"
-        description="A practical guide to the QuoteKit private-pilot workflow."
+        description="A practical guide to the QuoteVia private-pilot workflow."
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">

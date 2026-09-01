@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "QuoteKit online quotation software for small businesses";
+export const alt = "QuoteVia online quotation software for small businesses";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -49,7 +49,7 @@ export default function OpenGraphImage() {
             >
               Q
             </div>
-            <span style={{ fontSize: "36px", fontWeight: 700 }}>QuoteKit</span>
+            <span style={{ fontSize: "36px", fontWeight: 700 }}>QuoteVia</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <div
