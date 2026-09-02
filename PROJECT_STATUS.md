@@ -1,5 +1,12 @@
 # QuoteVia Project Status
 
+## Latest update
+
+- Removed the visible email link from the marketing-page footer.
+- Kept the responsive floating email action: a labelled pill on larger screens and an accessible icon button on mobile.
+- Reused the existing Lucide icon and QuoteVia button colour conventions; no dependency, database, migration, environment variable, Server Action, or Route Handler changes were required.
+- Validation passed: TypeScript and ESLint.
+
 ## Current sprint
 
 Sprint 11: Technical and on-page launch SEO — implementation complete.

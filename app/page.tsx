@@ -9,6 +9,7 @@ import {
   FileText,
   Hammer,
   LayoutDashboard,
+  Mail,
   Send,
   Sparkles,
   Users,
@@ -23,11 +24,7 @@ import {
   homepageStructuredData,
   serializeJsonLd,
 } from "@/lib/homepage-structured-data";
-import {
-  HOMEPAGE_DESCRIPTION,
-  HOMEPAGE_TITLE,
-  SITE_NAME,
-} from "@/lib/seo";
+import { HOMEPAGE_DESCRIPTION, HOMEPAGE_TITLE, SITE_NAME } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -154,6 +151,8 @@ const questions = [
   },
 ];
 
+const CONTACT_EMAIL = "hello@quotevia.co.za";
+
 export default function HomePage() {
   return (
     <div className="min-h-dvh bg-[#fbfbfc]">
@@ -222,9 +221,9 @@ export default function HomePage() {
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
                 QuoteVia helps small service businesses create accurate customer
                 quotations, send them through a secure online link, and track
-                every view, acceptance, or decline. Keep pricing, tax, discounts,
-                and quote status together instead of chasing Word files and PDF
-                attachments.
+                every view, acceptance, or decline. Keep pricing, tax,
+                discounts, and quote status together instead of chasing Word
+                files and PDF attachments.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -291,7 +290,9 @@ export default function HomePage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Prepared for</p>
+                      <p className="text-xs text-muted-foreground">
+                        Prepared for
+                      </p>
                       <p className="mt-1 text-sm font-medium">Hart & Finch</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         Expires 30 Sep 2026
@@ -309,11 +310,15 @@ export default function HomePage() {
                         className="flex items-center justify-between gap-4 text-sm"
                       >
                         <span className="text-muted-foreground">{name}</span>
-                        <span className="font-medium tabular-nums">{price}</span>
+                        <span className="font-medium tabular-nums">
+                          {price}
+                        </span>
                       </div>
                     ))}
                     <div className="flex items-end justify-between border-t pt-4">
-                      <span className="text-sm font-medium">Total incl. VAT</span>
+                      <span className="text-sm font-medium">
+                        Total incl. VAT
+                      </span>
                       <span className="text-2xl font-semibold tracking-tight tabular-nums">
                         R 51,635
                       </span>
@@ -492,11 +497,22 @@ export default function HomePage() {
         </section>
       </main>
 
+      <a
+        href={`mailto:${CONTACT_EMAIL}`}
+        aria-label={`Email QuoteVia at ${CONTACT_EMAIL}`}
+        className="fixed right-4 bottom-4 z-30 inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:right-6 sm:bottom-6 sm:h-11 sm:w-auto sm:gap-2 sm:px-4"
+      >
+        <Mail className="size-5" aria-hidden="true" />
+        <span className="hidden text-sm font-medium sm:inline">Email us</span>
+      </a>
+
       <footer className="border-t">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div>
             <Logo />
-            <p className="mt-2">Online quotation software for service businesses.</p>
+            <p className="mt-2">
+              Online quotation software for service businesses.
+            </p>
           </div>
           <nav aria-label="Footer navigation" className="flex flex-wrap gap-5">
             <Link href="/login" className="hover:text-foreground">
