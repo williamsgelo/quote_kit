@@ -2,14 +2,38 @@
 
 ## Latest update
 
-- Removed the visible email link from the marketing-page footer.
-- Kept the responsive floating email action: a labelled pill on larger screens and an accessible icon button on mobile.
-- Reused the existing Lucide icon and QuoteVia button colour conventions; no dependency, database, migration, environment variable, Server Action, or Route Handler changes were required.
-- Validation passed: TypeScript and ESLint.
+- Added two focused public acquisition pages: `/online-quote-maker` and `/quotation-software-south-africa`.
+- Added unique metadata, canonicals, one H1 per page, workflow and audience content, visible FAQs, account CTAs, and contextual internal links.
+- Expanded the sitemap to the three indexable public marketing routes while retaining all existing noindex controls for authentication, onboarding, application, and secure customer Quote routes.
+- Kept both pages statically prerendered Server Components with no new client JavaScript or dependencies.
 
 ## Current sprint
 
-Sprint 11: Technical and on-page launch SEO — implementation complete.
+Sprint 12: SEO acquisition landing pages — implementation complete.
+
+## Acquisition and indexation
+
+- `/`, `/online-quote-maker`, and `/quotation-software-south-africa` are indexable, have self-referencing canonical URLs, and are the only routes in `sitemap.xml`.
+- The online quote maker page focuses on preparing a complete quote, the create/send/track/approval workflow, and suitability for small service businesses.
+- The South African quotation software page focuses on ZAR presentation, tax and discounts, secure delivery, status visibility, and local service-business use cases.
+- The pages share a lightweight public header and footer, while their main content, headings, FAQs, and search intent remain distinct.
+- The homepage now links contextually to both acquisition pages; each acquisition page links to the homepage, the other acquisition page, and signup.
+- Existing Organization, WebSite, WebPage, and SoftwareApplication homepage JSON-LD remains unchanged. No duplicated landing-page schema, ratings, reviews, offers, customer counts, or testimonials were added.
+- `/login`, `/signup`, `/onboarding`, all authenticated application routes, `/help`, and `/q/[token]` remain noindex. Secure Quote URLs remain absent from the sitemap and retain their `X-Robots-Tag: noindex, nofollow` response header.
+- No Prisma schema, migrations, environment variables, Server Actions, Route Handlers, authentication logic, quote behavior, pricing logic, or customer workflow changed.
+
+## Sprint 12 validation
+
+- TypeScript: passed.
+- ESLint: passed with no warnings.
+- Unit tests: all 39 passed.
+- Aggregate tests: all 39 unit tests passed; 39 integration tests could not reach the configured PostgreSQL database in the sandbox and failed in unchanged Prisma setup hooks.
+- Production build: passed; both new pages are statically prerendered.
+- Production HTML: all three public marketing routes returned 200, had exactly one H1, emitted index/follow metadata, and resolved the expected canonical and page title.
+- `sitemap.xml`: returned 200 and contained exactly the three public marketing routes; no customer Quote token appeared.
+- Invalid `/q/[token]`: returned 404 with `X-Robots-Tag: noindex, nofollow`.
+- `/login` and `/signup`: returned 200 with `noindex, nofollow`; unauthenticated private routes continued redirecting to `/login`.
+- `git diff --check`: passed.
 
 ## QuoteVia branding alignment
 
@@ -28,7 +52,7 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 
 ## Indexation strategy
 
-- `/` is the only indexable route and the only sitemap entry.
+- `/`, `/online-quote-maker`, and `/quotation-software-south-africa` are the indexable routes and the only sitemap entries.
 - `/login` and `/signup` are public but explicitly `noindex, nofollow`.
 - `/onboarding` and the shared authenticated application layout are explicitly `noindex, nofollow`.
 - `/help` remains authenticated and noindex; it was not moved or duplicated as a public marketing page.
@@ -53,7 +77,7 @@ Sprint 11: Technical and on-page launch SEO — implementation complete.
 - Added `metadataBase`, title defaults/template, description, application name, index/follow defaults, icons, Open Graph, and Twitter metadata.
 - Added a self-referencing homepage canonical.
 - Added `app/robots.ts` with the canonical host, sitemap reference, and scoped crawl exclusions.
-- Added `app/sitemap.ts` containing only `https://quotevia.co.za/`.
+- Added `app/sitemap.ts`; it now contains only the homepage and the two public acquisition pages.
 - Added `X-Robots-Tag: noindex, nofollow` response headers for Auth/API and secure Quote paths.
 - Added a permanent `www.quotevia.co.za` to `quotevia.co.za` redirect when the request reaches the application on the www host.
 - Added a linked homepage JSON-LD graph with Organization, WebSite, WebPage, and SoftwareApplication nodes.

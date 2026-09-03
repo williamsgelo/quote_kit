@@ -478,22 +478,80 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
-          <p className="text-sm font-medium text-primary">Start simply</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-            Create your next professional quote with QuoteVia
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
-            Set up a workspace, add a customer, and build a quotation with clear
-            pricing and an online path to a decision.
-          </p>
-          <Link
-            href="/signup"
-            className={cn(buttonVariants({ size: "lg" }), "mt-7 h-11 px-5")}
-          >
-            Create an account
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
+        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-primary">
+              Explore the quotation workflow
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+              Find the right starting point for your business
+            </h2>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              Learn more about creating customer-ready quotes online and how
+              QuoteVia fits the needs of South African service businesses.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
+            <Link
+              href="/online-quote-maker"
+              className="group rounded-xl border bg-background p-6 transition-colors hover:border-blue-300"
+            >
+              <p className="font-semibold">Online quote maker</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                See how to create, send, track, and collect a customer decision
+                on a professional quote.
+              </p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                Explore the online quote maker
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </span>
+            </Link>
+            <Link
+              href="/quotation-software-south-africa"
+              className="group rounded-xl border bg-background p-6 transition-colors hover:border-blue-300"
+            >
+              <p className="font-semibold">
+                Quotation software for South Africa
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Explore a focused quoting workflow for local freelancers,
+                agencies, contractors, trades, and service teams.
+              </p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                Explore South African quotation software
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </span>
+            </Link>
+          </div>
+        </section>
+
+        <section className="border-t bg-white">
+          <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
+            <p className="text-sm font-medium text-primary">Start simply</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+              Create your next professional quote with QuoteVia
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
+              Set up a workspace, add a customer, and build a quotation with
+              clear pricing and an online path to a decision.
+            </p>
+            <Link
+              href="/signup"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "mt-7 h-11 px-5",
+              )}
+            >
+              Create an account
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
         </section>
       </main>
 
@@ -515,6 +573,15 @@ export default function HomePage() {
             </p>
           </div>
           <nav aria-label="Footer navigation" className="flex flex-wrap gap-5">
+            <Link href="/online-quote-maker" className="hover:text-foreground">
+              Online quote maker
+            </Link>
+            <Link
+              href="/quotation-software-south-africa"
+              className="hover:text-foreground"
+            >
+              Quotation software South Africa
+            </Link>
             <Link href="/login" className="hover:text-foreground">
               Log in
             </Link>
