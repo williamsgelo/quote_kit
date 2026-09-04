@@ -18,5 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_ORIGIN}/quotation-software-south-africa`,
       lastModified,
     },
+    {
+      url: `${SITE_ORIGIN}/free-quotation-template`,
+      lastModified,
+    },
   ];
 }

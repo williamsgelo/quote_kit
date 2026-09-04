@@ -4,7 +4,7 @@ import { Logo } from "@/components/shared/logo";
 
 export function PublicPageFooter() {
   return (
-    <footer className="border-t">
+    <footer className="border-t print:hidden">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-10 text-sm text-muted-foreground sm:px-6 md:grid-cols-[1fr_auto] md:items-end lg:px-8">
         <div>
           <Logo />
@@ -27,6 +27,12 @@ export function PublicPageFooter() {
             className="hover:text-foreground"
           >
             Quotation software South Africa
+          </Link>
+          <Link
+            href="/free-quotation-template"
+            className="hover:text-foreground"
+          >
+            Free quotation template
           </Link>
           <Link href="/signup" className="hover:text-foreground">
             Create an account

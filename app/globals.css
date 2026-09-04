@@ -137,3 +137,61 @@
     background-size: 32px 32px;
   }
 }
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .quotation-print-area {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .quotation-template {
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .quotation-template > div:first-child {
+    padding: 0 0 7mm !important;
+    border-color: #cbd5e1 !important;
+    background: #fff !important;
+    color: #0f172a !important;
+  }
+
+  .quotation-template > div:first-child * {
+    color: inherit !important;
+  }
+
+  .quotation-template > div:last-child {
+    padding: 7mm 0 0 !important;
+  }
+
+  .quotation-template-section,
+  .quotation-template tr {
+    break-inside: avoid;
+  }
+
+  .quotation-template [contenteditable="true"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .quotation-template a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

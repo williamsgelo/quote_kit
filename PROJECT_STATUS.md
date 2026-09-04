@@ -2,22 +2,48 @@
 
 ## Latest update
 
-- Added two focused public acquisition pages: `/online-quote-maker` and `/quotation-software-south-africa`.
-- Added unique metadata, canonicals, one H1 per page, workflow and audience content, visible FAQs, account CTAs, and contextual internal links.
-- Expanded the sitemap to the three indexable public marketing routes while retaining all existing noindex controls for authentication, onboarding, application, and secure customer Quote routes.
-- Kept both pages statically prerendered Server Components with no new client JavaScript or dependencies.
+- Added `/free-quotation-template` as a genuinely useful public acquisition resource available without signup.
+- Added a complete locally editable quotation structure covering business, customer, dates, line items, totals, notes, terms, and acceptance.
+- Added native browser Print / Save as PDF behavior with A4 print CSS and explicit confirmation that QuoteVia does not submit, upload, or persist template content.
+- Linked the resource into the existing public acquisition cluster and added it to the sitemap.
 
 ## Current sprint
 
-Sprint 12: SEO acquisition landing pages — implementation complete.
+Sprint 13: Free quotation template acquisition resource — implementation complete.
+
+## Free quotation template
+
+- `/free-quotation-template` targets free, professional, small-business, and South African quotation-template intent with unique Metadata API title, description, canonical, Open Graph, and Twitter fields.
+- The resource delivers the editable template before any product conversion content and requires no QuoteVia account.
+- Highlighted content-editable fields work locally in the browser without React state, form submission, database writes, or storage.
+- The template includes business and optional company details, quote reference and dates, customer contact and address, three editable line items, subtotal, discount, tax/VAT, total, notes, terms, and written/signature acceptance guidance.
+- Visitors manually enter their own prices and totals. The page clearly distinguishes this resource from a future quotation generator.
+- A minimal Client Component invokes the native browser print dialog; print CSS hides navigation, educational content, and CTAs so only the quotation document prints or saves to PDF.
+- Educational content covers essential quotation information, practical 7/14/30-day validity considerations, non-advisory tax/VAT guidance, and quotation-versus-invoice differences.
+- Product conversion appears after the template and guidance, explaining when QuoteVia can replace repeated document work with online sending, view tracking, and accept/decline responses.
+- The page links naturally to the homepage, online quote maker, and South African quotation software pages. A code-level resource-list location is reserved for `/free-quotation-generator`, but no link is emitted before that route exists.
+- FAQ structured data was not added because QuoteVia is not an authoritative government or health site eligible for regular Google FAQ rich results. No new or fabricated schema was added.
+- No database schema, migration, Quote record, pricing logic, authentication, customer workflow, Server Action, Route Handler, dependency, or environment variable changed.
+
+## Sprint 13 validation
+
+- TypeScript: passed.
+- ESLint: passed with no warnings.
+- Unit tests: all 39 passed.
+- Aggregate tests: all 39 unit tests passed; 39 integration tests could not reach the configured PostgreSQL database in the sandbox and failed in unchanged Prisma setup hooks.
+- Production build: passed; `/free-quotation-template` is statically prerendered.
+- Production HTML: returned 200 with exactly one H1, 31 editable fields, `index, follow`, the expected title and description, and the canonical `https://quotevia.co.za/free-quotation-template`.
+- `sitemap.xml`: returned 200 and contained exactly the four intended public marketing routes.
+- Automated in-app browser visual and native print-dialog testing was unavailable because no browser session was attached. Manual print-preview and responsive viewport checks remain required before deployment.
+- `git diff --check`: passed.
 
 ## Acquisition and indexation
 
-- `/`, `/online-quote-maker`, and `/quotation-software-south-africa` are indexable, have self-referencing canonical URLs, and are the only routes in `sitemap.xml`.
+- `/`, `/online-quote-maker`, `/quotation-software-south-africa`, and `/free-quotation-template` are indexable, have self-referencing canonical URLs, and are the only routes in `sitemap.xml`.
 - The online quote maker page focuses on preparing a complete quote, the create/send/track/approval workflow, and suitability for small service businesses.
 - The South African quotation software page focuses on ZAR presentation, tax and discounts, secure delivery, status visibility, and local service-business use cases.
 - The pages share a lightweight public header and footer, while their main content, headings, FAQs, and search intent remain distinct.
-- The homepage now links contextually to both acquisition pages; each acquisition page links to the homepage, the other acquisition page, and signup.
+- The homepage and shared marketing navigation link to the acquisition pages and free quotation template; the resource links back into the full public acquisition cluster.
 - Existing Organization, WebSite, WebPage, and SoftwareApplication homepage JSON-LD remains unchanged. No duplicated landing-page schema, ratings, reviews, offers, customer counts, or testimonials were added.
 - `/login`, `/signup`, `/onboarding`, all authenticated application routes, `/help`, and `/q/[token]` remain noindex. Secure Quote URLs remain absent from the sitemap and retain their `X-Robots-Tag: noindex, nofollow` response header.
 - No Prisma schema, migrations, environment variables, Server Actions, Route Handlers, authentication logic, quote behavior, pricing logic, or customer workflow changed.
@@ -52,7 +78,7 @@ Sprint 12: SEO acquisition landing pages — implementation complete.
 
 ## Indexation strategy
 
-- `/`, `/online-quote-maker`, and `/quotation-software-south-africa` are the indexable routes and the only sitemap entries.
+- `/`, `/online-quote-maker`, `/quotation-software-south-africa`, and `/free-quotation-template` are the indexable routes and the only sitemap entries.
 - `/login` and `/signup` are public but explicitly `noindex, nofollow`.
 - `/onboarding` and the shared authenticated application layout are explicitly `noindex, nofollow`.
 - `/help` remains authenticated and noindex; it was not moved or duplicated as a public marketing page.

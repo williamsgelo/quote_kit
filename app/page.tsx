@@ -491,7 +491,7 @@ export default function HomePage() {
               QuoteVia fits the needs of South African service businesses.
             </p>
           </div>
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/online-quote-maker"
               className="group rounded-xl border bg-background p-6 transition-colors hover:border-blue-300"
@@ -522,6 +522,23 @@ export default function HomePage() {
               </p>
               <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">
                 Explore South African quotation software
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </span>
+            </Link>
+            <Link
+              href="/free-quotation-template"
+              className="group rounded-xl border bg-background p-6 transition-colors hover:border-blue-300"
+            >
+              <p className="font-semibold">Free quotation template</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Edit and print a complete professional quotation template, with
+                guidance for validity, tax, terms, and acceptance.
+              </p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                Use the free template
                 <ArrowRight
                   className="size-4 transition-transform group-hover:translate-x-0.5"
                   aria-hidden="true"
